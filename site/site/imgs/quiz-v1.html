@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Teste do Intestino de Caneta™ | Avaliação Bristol</title>
+<style>
+  :root{
+    --bg:#F4F8F6;
+    --card:#FFFFFF;
+    --ink:#16302B;
+    --ink-soft:#4E6660;
+    --teal:#0E6B5C;
+    --teal-deep:#0A4A40;
+    --cta:#F26B3A;
+    --cta-deep:#D9541F;
+    --amber:#FFB930;
+    --danger:#C9402E;
+    --line:#DCE8E3;
+    --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:var(--bg);
+  }
+  /* ---------- header ---------- */
+  .topbar{
+    padding:14px 20px 10px;
+    text-align:center;
+  }
+  .brand{
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    color:var(--teal-deep);
+  }
+  .brand span{color:var(--cta);}
+  .progress-wrap{
+    padding:0 20px 6px;
+  }
+  .progress-track{
+    height:6px;
+    background:var(--line);
+    border-radius:99px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    width:4%;
+    background:linear-gradient(90deg,var(--teal),#1AA88F);
+    border-radius:99px;
+    transition:width .45s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-label{
+    font-size:11px;
+    color:var(--ink-soft);
+    text-align:right;
+    margin-top:5px;
+    font-weight:600;
+  }
+  /* ---------- screens ---------- */
+  .stage{flex:1;position:relative;overflow:hidden;}
+  .screen{
+    position:absolute;
+    inset:0;
+    padding:18px 20px 32px;
+    overflow-y:auto;
+    opacity:0;
+    transform:translateX(28px);
+    pointer-events:none;
+    transition:opacity .35s ease,transform .35s ease;
+    display:flex;
+    flex-direction:column;
+  }
+  .screen.active{
+    opacity:1;
+    transform:translateX(0);
+    pointer-events:auto;
+  }
+  .eyebrow{
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:1.8px;
+    text-transform:uppercase;
+    color:var(--teal);
+    margin-bottom:10px;
+  }
+  h1{
+    font-size:24px;
+    line-height:1.25;
+    font-weight:800;
+    letter-spacing:-.3px;
+    margin-bottom:10px;
+  }
+  h2{
+    font-size:21px;
+    line-height:1.3;
+    font-weight:800;
+    letter-spacing:-.2px;
+    margin-bottom:8px;
+  }
+  .sub{
+    font-size:15px;
+    line-height:1.55;
+    color:var(--ink-soft);
+    margin-bottom:18px;
+  }
+  .sub b{color:var(--ink);}
+  mark{
+    background:linear-gradient(transparent 55%, #FFE3A6 55%);
+    color:inherit;
+    padding:0 2px;
+  }
+  /* ---------- options ---------- */
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .opt{
+    background:var(--card);
+    border:2px solid var(--line);
+    border-radius:var(--radius);
+    padding:15px 16px;
+    font-size:15.5px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-align:left;
+    transition:border-color .15s,transform .12s,background .15s;
+  }
+  .opt:active{transform:scale(.98);}
+  .opt.selected{
+    border-color:var(--teal);
+    background:#EAF5F1;
+  }
+  .opt .emoji{font-size:22px;flex-shrink:0;}
+  .opt small{display:block;font-weight:500;color:var(--ink-soft);font-size:12.5px;margin-top:2px;}
+  /* ---------- bristol cards ---------- */
+  .bristol-note{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#EAF5F1;
+    border:1px solid #CBE4DB;
+    border-radius:12px;
+    padding:10px 12px;
+    margin-bottom:14px;
+  }
+  .bristol-note svg{flex-shrink:0;}
+  .bristol-note p{font-size:12.5px;line-height:1.45;color:var(--teal-deep);font-weight:600;}
+  .bristol-grid{display:flex;flex-direction:column;gap:10px;}
+  .bcard{
+    background:var(--card);
+    border:2px solid var(--line);
+    border-radius:var(--radius);
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    cursor:pointer;
+    transition:border-color .15s,transform .12s,background .15s;
+  }
+  .bcard:active{transform:scale(.98);}
+  .bcard.selected{border-color:var(--teal);background:#EAF5F1;}
+  .bcard .pic{
+    width:74px;
+    height:46px;
+    flex-shrink:0;
+    background:#F7F3EC;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .bcard .txt b{font-size:14.5px;display:block;}
+  .bcard .txt span{font-size:12.5px;color:var(--ink-soft);line-height:1.4;display:block;margin-top:2px;}
+  .btag{
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.8px;
+    text-transform:uppercase;
+    border-radius:6px;
+    padding:2px 7px;
+    display:inline-block;
+    margin-top:5px;
+  }
+  .btag.hard{background:#FBE3DE;color:var(--danger);}
+  .btag.ok{background:#DFF2E8;color:#177A4C;}
+  .btag.loose{background:#FFF1D6;color:#9A6A00;}
+  /* ---------- info pages ---------- */
+  .info-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 18px;
+    margin-bottom:14px;
+  }
+  .stat-hero{
+    text-align:center;
+    padding:22px 16px;
+    background:linear-gradient(160deg,#0E6B5C,#0A4A40);
+    color:#fff;
+    border-radius:var(--radius);
+    margin-bottom:14px;
+  }
+  .stat-hero .big{
+    font-size:52px;
+    font-weight:800;
+    letter-spacing:-1px;
+    line-height:1;
+  }
+  .stat-hero .big small{font-size:22px;font-weight:700;}
+  .stat-hero p{font-size:14px;margin-top:8px;opacity:.92;line-height:1.5;}
+  .src{
+    font-size:11px;
+    color:var(--ink-soft);
+    text-align:center;
+    margin-top:10px;
+  }
+  .mech{
+    display:flex;
+    flex-direction:column;
+    gap:0;
+  }
+  .mech-step{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+  }
+  .mech-rail{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    flex-shrink:0;
+  }
+  .mech-dot{
+    width:34px;height:34px;
+    border-radius:50%;
+    background:#EAF5F1;
+    border:2px solid var(--teal);
+    color:var(--teal-deep);
+    font-weight:800;
+    font-size:14px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .mech-line{width:2px;flex:1;min-height:26px;background:var(--line);}
+  .mech-step .mtxt{padding-bottom:18px;}
+  .mech-step .mtxt b{font-size:14.5px;display:block;margin-bottom:2px;}
+  .mech-step .mtxt span{font-size:13.5px;color:var(--ink-soft);line-height:1.5;}
+  .warn-box{
+    background:#FDF0EC;
+    border:1px solid #F3CFC5;
+    border-radius:var(--radius);
+    padding:16px;
+    margin-top:4px;
+  }
+  .warn-box b{color:var(--danger);font-size:14.5px;}
+  .warn-box p{font-size:13.5px;color:#6B4038;line-height:1.55;margin-top:5px;}
+  /* ---------- buttons ---------- */
+  .btn{
+    width:100%;
+    border:none;
+    border-radius:14px;
+    padding:17px;
+    font-size:16.5px;
+    font-weight:800;
+    letter-spacing:.2px;
+    cursor:pointer;
+    color:#fff;
+    background:linear-gradient(180deg,var(--cta),var(--cta-deep));
+    box-shadow:0 6px 18px rgba(242,107,58,.35);
+    transition:transform .12s;
+    margin-top:auto;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn.teal{
+    background:linear-gradient(180deg,#128268,var(--teal-deep));
+    box-shadow:0 6px 18px rgba(14,107,92,.3);
+  }
+  .btn-spacer{margin-top:18px;}
+  /* ---------- testimonial ---------- */
+  .testi{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    margin-top:14px;
+  }
+  .testi .who{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .avatar{
+    width:40px;height:40px;border-radius:50%;
+    background:linear-gradient(135deg,#FFB930,#F26B3A);
+    color:#fff;font-weight:800;font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .testi .who b{font-size:14px;display:block;}
+  .stars{color:#FFB930;font-size:12px;letter-spacing:1px;}
+  .testi p{font-size:13.5px;line-height:1.55;color:var(--ink-soft);font-style:italic;}
+  /* ---------- loading ---------- */
+  .load-wrap{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    gap:22px;
+  }
+  .ring{
+    width:110px;height:110px;
+    position:relative;
+  }
+  .ring svg{transform:rotate(-90deg);}
+  .ring .pct{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:24px;font-weight:800;color:var(--teal-deep);
+  }
+  .load-msg{
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    min-height:44px;
+    line-height:1.5;
+  }
+  .load-check{
+    font-size:13px;
+    color:var(--ink-soft);
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    align-items:flex-start;
+  }
+  .load-check div{display:flex;gap:8px;align-items:center;opacity:.25;transition:opacity .4s;}
+  .load-check div.done{opacity:1;}
+  .load-check .tick{color:var(--teal);font-weight:800;}
+  /* ---------- result ---------- */
+  .result-badge{
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .result-badge .tag{
+    display:inline-block;
+    background:#FBE3DE;
+    color:var(--danger);
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    padding:6px 14px;
+    border-radius:99px;
+  }
+  .gauge-wrap{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 16px 16px;
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .gauge-bar{
+    height:14px;
+    border-radius:99px;
+    background:linear-gradient(90deg,#2FA97C 0%,#FFB930 50%,#C9402E 100%);
+    position:relative;
+    margin:18px 6px 6px;
+  }
+  .gauge-pin{
+    position:absolute;
+    top:-9px;
+    width:4px;height:32px;
+    background:var(--ink);
+    border-radius:4px;
+    transform:translateX(-50%);
+    transition:left 1s cubic-bezier(.4,0,.2,1);
+  }
+  .gauge-pin::after{
+    content:"";
+    position:absolute;
+    top:-7px;left:50%;
+    transform:translateX(-50%);
+    border:6px solid transparent;
+    border-top-color:var(--ink);
+  }
+  .gauge-scale{
+    display:flex;justify-content:space-between;
+    font-size:10.5px;color:var(--ink-soft);
+    font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+    padding:4px 2px 0;
+  }
+  .diag-list{display:flex;flex-direction:column;gap:9px;margin-bottom:14px;}
+  .diag-row{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    font-size:13.5px;
+  }
+  .diag-row span{color:var(--ink-soft);font-weight:600;}
+  .diag-row b{text-align:right;}
+  .diag-row b.bad{color:var(--danger);}
+  .diag-row b.good{color:#177A4C;}
+  .proto{
+    background:linear-gradient(160deg,#0E6B5C,#0A4A40);
+    border-radius:var(--radius);
+    padding:22px 18px;
+    color:#fff;
+    margin-bottom:14px;
+  }
+  .proto .p-eyebrow{
+    font-size:10.5px;font-weight:800;letter-spacing:2px;
+    text-transform:uppercase;color:var(--amber);
+    margin-bottom:8px;
+  }
+  .proto h3{font-size:19px;line-height:1.3;margin-bottom:12px;}
+  .proto ul{list-style:none;display:flex;flex-direction:column;gap:9px;}
+  .proto li{
+    font-size:13.5px;line-height:1.5;
+    display:flex;gap:9px;align-items:flex-start;
+  }
+  .proto li .tick{color:var(--amber);font-weight:800;flex-shrink:0;}
+  .scarcity{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--danger);
+    font-weight:700;
+    margin-top:10px;
+  }
+  .guarantee{
+    display:flex;align-items:center;gap:10px;
+    justify-content:center;
+    margin-top:12px;
+    font-size:12px;color:var(--ink-soft);
+  }
+  .disclaimer{
+    font-size:10.5px;
+    color:#9AAEA8;
+    line-height:1.5;
+    text-align:center;
+    margin-top:16px;
+    padding:0 6px;
+  }
+  .hero-icon{
+    width:76px;height:76px;
+    border-radius:22px;
+    background:linear-gradient(160deg,#0E6B5C,#0A4A40);
+    display:flex;align-items:center;justify-content:center;
+    margin:6px auto 18px;
+    box-shadow:0 10px 26px rgba(10,74,64,.28);
+  }
+  .center{text-align:center;}
+  .social-count{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    font-size:12.5px;color:var(--ink-soft);font-weight:600;
+    margin-top:14px;
+  }
+  .dots{display:flex;}
+  .dots i{
+    width:24px;height:24px;border-radius:50%;
+    border:2px solid var(--bg);
+    margin-left:-8px;
+    background:linear-gradient(135deg,#B9D8CE,#7FB8A8);
+    display:block;
+  }
+  .dots i:first-child{margin-left:0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">TESTE DO <span>INTESTINO DE CANETA</span>™</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="pfill"></div></div>
+    <div class="progress-label" id="plabel">Etapa 1 de 13</div>
+  </div>
+
+  <div class="stage" id="stage"></div>
+</div>
+
+<script>
+/* =========================================================
+   TESTE DO INTESTINO DE CANETA™ — funil de quiz com Escala de Bristol
+   Fluxo: segmentação → aquecimento → dopamina → Bristol →
+   mecanismo do problema → emoção → medo → personalização →
+   loading → resultado personalizado → CTA para PV
+========================================================= */
+
+const answers = {};
+let stepIndex = 0;
+
+/* ---------- SVGs da Escala de Bristol (ilustração clínica abstrata) ---------- */
+const B = "#8A6244"; /* tom clínico */
+const bristolSVG = {
+  1:`<svg width="64" height="34" viewBox="0 0 64 34"><g fill="${B}"><circle cx="10" cy="12" r="5.5"/><circle cx="24" cy="20" r="5"/><circle cx="38" cy="10" r="5.5"/><circle cx="52" cy="18" r="5"/><circle cx="30" cy="28" r="4"/></g></svg>`,
+  2:`<svg width="64" height="34" viewBox="0 0 64 34"><path fill="${B}" d="M8 17c0-6 5-10 10-9 3-4 9-4 12 0 4-3 10-2 12 2 5-1 10 2 10 7s-5 8-10 7c-2 4-8 5-12 2-3 4-9 4-12 0-5 1-10-3-10-9z"/></svg>`,
+  3:`<svg width="64" height="34" viewBox="0 0 64 34"><rect x="6" y="9" width="52" height="16" rx="8" fill="${B}"/><g stroke="#6B4A31" stroke-width="1.6" stroke-linecap="round"><line x1="18" y1="11" x2="16" y2="17"/><line x1="30" y1="12" x2="28" y2="19"/><line x1="42" y1="11" x2="40" y2="17"/><line x1="52" y1="13" x2="50" y2="19"/></g></svg>`,
+  4:`<svg width="64" height="34" viewBox="0 0 64 34"><rect x="6" y="10" width="52" height="14" rx="7" fill="${B}"/></svg>`,
+  5:`<svg width="64" height="34" viewBox="0 0 64 34"><g fill="${B}"><ellipse cx="14" cy="14" rx="8" ry="6"/><ellipse cx="34" cy="20" rx="9" ry="6.5"/><ellipse cx="52" cy="12" rx="7" ry="5.5"/></g></svg>`,
+  6:`<svg width="64" height="34" viewBox="0 0 64 34"><g fill="${B}" opacity=".85"><path d="M10 14c3-4 8-3 9 1 2 3-1 7-5 6s-6-4-4-7z"/><path d="M26 20c2-5 9-4 10 0 1 4-3 8-7 6-3-1-4-4-3-6z"/><path d="M44 12c3-3 9-2 9 2 1 4-4 7-7 5-3-1-4-5-2-7z"/></g></svg>`,
+  7:`<svg width="64" height="34" viewBox="0 0 64 34"><path fill="${B}" opacity=".55" d="M6 20c6-6 14-6 20 0s14 6 20 0 10-4 12 0v8H6z"/><ellipse cx="20" cy="12" rx="3" ry="2" fill="${B}" opacity=".4"/><ellipse cx="44" cy="10" rx="2.5" ry="1.8" fill="${B}" opacity=".4"/></svg>`
+};
+
+/* ---------- definição das etapas ---------- */
+const steps = [
+
+/* 1 — SEGMENTAÇÃO */
+{
+  render:()=>`
+    <div class="eyebrow">Avaliação gratuita · 2 minutos</div>
+    <h1>Seu intestino <mark>travou</mark> depois que você começou a caneta?</h1>
+    <p class="sub">Responda 10 perguntas rápidas baseadas na <b>Escala de Bristol</b> — o padrão usado por gastroenterologistas — e descubra o grau da sua constipação e como destravar <b>sem interromper o tratamento</b>.</p>
+    <div class="options">
+      ${opt('caneta','Mounjaro (tirzepatida)','💉')}
+      ${opt('caneta','Ozempic / Wegovy (semaglutida)','💉')}
+      ${opt('caneta','Saxenda ou manipulado','💉')}
+      ${opt('caneta','Ainda não uso, mas vou começar','🕐')}
+    </div>
+    <div class="social-count">
+      <div class="dots"><i></i><i></i><i></i><i></i></div>
+      <span>+3.400 avaliações concluídas esta semana</span>
+    </div>`
+},
+
+/* 2 — TEMPO DE USO */
+{
+  render:()=>`
+    <div class="eyebrow">Sobre o seu tratamento</div>
+    <h2>Há quanto tempo você usa a caneta?</h2>
+    <p class="sub">A constipação costuma piorar nos <b>aumentos de dose</b> — por isso essa informação importa.</p>
+    <div class="options">
+      ${opt('tempo','Menos de 1 mês','🌱')}
+      ${opt('tempo','1 a 3 meses','📅')}
+      ${opt('tempo','3 a 6 meses','📆')}
+      ${opt('tempo','Mais de 6 meses','⏳')}
+    </div>`
+},
+
+/* 3 — FREQUÊNCIA */
+{
+  render:()=>`
+    <div class="eyebrow">Hábito intestinal</div>
+    <h2>Quantas vezes você foi ao banheiro na última semana?</h2>
+    <p class="sub">Seja honesta — ninguém vê suas respostas. 😉</p>
+    <div class="options">
+      ${opt('freq','Todos os dias','✅','freq:0')}
+      ${opt('freq','4 a 6 vezes','🙂','freq:1')}
+      ${opt('freq','2 a 3 vezes','😐','freq:2')}
+      ${opt('freq','1 vez ou nenhuma','😣','freq:3')}
+    </div>`
+},
+
+/* 4 — TIRO DE DOPAMINA */
+{
+  info:true,
+  render:()=>`
+    <div class="eyebrow">Você não está sozinha</div>
+    <div class="stat-hero">
+      <div class="big">1 <small>em cada</small> 5</div>
+      <p>usuários de canetas GLP-1 desenvolve constipação durante o tratamento — nos estudos clínicos SURMOUNT (tirzepatida), a taxa chegou a <b>17%</b>, e com semaglutida ficou próxima de <b>24%</b>.</p>
+    </div>
+    <p class="src">Fonte: ensaios clínicos SURMOUNT-1 e STEP</p>
+    <div class="testi">
+      <div class="who">
+        <div class="avatar">R</div>
+        <div><b>Renata M., 46 — Goiânia/GO</b><div class="stars">★★★★★</div></div>
+      </div>
+      <p>"Eu já tinha eliminado 9kg com o Mounjaro, mas passava 5 dias sem ir ao banheiro. Achei que era o preço a pagar. Não era. Em 2 semanas de protocolo meu intestino voltou ao normal — sem parar a caneta."</p>
+    </div>
+    <button class="btn teal btn-spacer" onclick="next()">CONTINUAR MINHA AVALIAÇÃO →</button>`
+},
+
+/* 5 — ESCALA DE BRISTOL */
+{
+  render:()=>`
+    <div class="eyebrow">Escala de Bristol</div>
+    <h2>Nos últimos 7 dias, qual formato descreve melhor as suas fezes?</h2>
+    <div class="bristol-note">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#0E6B5C"/><path d="M12 7v6M12 16.5v.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <p>A Escala de Bristol é a classificação clínica usada por gastroenterologistas no mundo todo para avaliar o trânsito intestinal.</p>
+    </div>
+    <div class="bristol-grid">
+      ${bristol(1,'Tipo 1 — Bolinhas duras e separadas','Difíceis de eliminar','hard','Constipação severa')}
+      ${bristol(2,'Tipo 2 — Formato de linguiça, mas granuloso','Compactado e ressecado','hard','Constipação')}
+      ${bristol(3,'Tipo 3 — Linguiça com rachaduras na superfície','Trânsito lentificado','loose','Tendência a ressecar')}
+      ${bristol(4,'Tipo 4 — Lisa e macia, formato de linguiça','O padrão ideal','ok','Normal')}
+      ${bristol(5,'Tipo 5 — Pedaços macios com bordas definidas','Trânsito acelerado','loose','Levemente solto')}
+      ${bristol(6,'Tipo 6 — Pedaços aerados, bordas irregulares','Consistência pastosa','loose','Solto')}
+      ${bristol(7,'Tipo 7 — Totalmente líquida','Sem pedaços sólidos','loose','Diarreia')}
+    </div>`
+},
+
+/* 6 — SINTOMAS (multi-select) */
+{
+  multi:true,
+  render:()=>`
+    <div class="eyebrow">Sintomas</div>
+    <h2>O que você tem sentido junto com o intestino preso?</h2>
+    <p class="sub">Selecione <b>todos</b> que se aplicam:</p>
+    <div class="options">
+      ${mopt('Barriga inchada / estufada','🎈')}
+      ${mopt('Esforço e dor para evacuar','😖')}
+      ${mopt('Sensação de evacuação incompleta','🔁')}
+      ${mopt('Gases presos e cólicas','💨')}
+      ${mopt('Náusea junto com o intestino preso','🤢')}
+      ${mopt('Nenhum desses','—')}
+    </div>
+    <button class="btn teal btn-spacer" onclick="confirmMulti()">CONTINUAR →</button>`
+},
+
+/* 7 — MECANISMO DO PROBLEMA */
+{
+  info:true,
+  render:()=>`
+    <div class="eyebrow">Por que isso acontece</div>
+    <h2>Não é você. É o mecanismo da caneta.</h2>
+    <p class="sub">O GLP-1 que faz você emagrecer é o <b>mesmo</b> que trava seu intestino:</p>
+    <div class="info-card">
+      <div class="mech">
+        ${mech(1,'A caneta desacelera TODO o trato digestivo','É assim que ela corta seu apetite: a comida fica mais tempo no estômago e no intestino.')}
+        ${mech(2,'O bolo fecal fica parado por mais tempo','E quanto mais tempo parado, mais água o intestino grosso absorve dele.')}
+        ${mech(3,'As fezes ressecam e endurecem','Resultado: Bristol tipo 1 e 2 — bolinhas duras, esforço, dor e dias sem ir ao banheiro.',true)}
+      </div>
+    </div>
+    <p class="sub" style="margin-top:6px">A boa notícia: como a causa é <mark>mecânica e previsível</mark>, ela responde muito bem a um protocolo específico — sem laxante todo dia e <b>sem reduzir a dose da caneta</b>.</p>
+    <button class="btn teal" onclick="next()">ENTENDI — CONTINUAR →</button>`
+},
+
+/* 8 — PERGUNTA EMOCIONAL */
+{
+  render:()=>`
+    <div class="eyebrow">Quase lá</div>
+    <h2>Como você se sente quando passa dias sem conseguir ir ao banheiro?</h2>
+    <div class="options">
+      ${opt('emocao','Inchada e desconfortável o dia todo','🎈')}
+      ${opt('emocao','Irritada — atrapalha minha rotina','😤')}
+      ${opt('emocao','Preocupada que algo pior aconteça','😟')}
+      ${opt('emocao','Já pensei em parar a caneta por causa disso','🚨')}
+    </div>`
+},
+
+/* 9 — MEDO / CONSEQUÊNCIA */
+{
+  info:true,
+  render:()=>`
+    <div class="eyebrow">Atenção</div>
+    <h2>Ignorar o intestino preso tem um custo.</h2>
+    <div class="warn-box">
+      <b>⚠️ Esforço repetido para evacuar = hemorroidas e fissuras</b>
+      <p>Quando as fezes estão ressecadas (Bristol 1 e 2), o esforço na evacuação aumenta a pressão nas veias da região anal. É por isso que hemorroidas são uma consequência comum da constipação não tratada em quem usa caneta.</p>
+    </div>
+    <div class="warn-box" style="margin-top:10px">
+      <b>⚠️ Muita gente desiste do tratamento</b>
+      <p>O desconforto intestinal crônico é um dos principais motivos de abandono das canetas — jogando fora todo o investimento e o progresso no emagrecimento.</p>
+    </div>
+    <p class="sub" style="margin-top:14px">Você não precisa escolher entre <b>emagrecer</b> e <b>viver bem</b>. Faltam só 3 perguntas para o seu resultado.</p>
+    <button class="btn teal" onclick="next()">FINALIZAR AVALIAÇÃO →</button>`
+},
+
+/* 10 — ÁGUA */
+{
+  render:()=>`
+    <div class="eyebrow">Personalização · 1 de 3</div>
+    <h2>Quanta água você bebe por dia?</h2>
+    <div class="options">
+      ${opt('agua','Menos de 1 litro','🥛')}
+      ${opt('agua','1 a 2 litros','💧')}
+      ${opt('agua','Mais de 2 litros','🚰')}
+      ${opt('agua','Não faço ideia','🤷‍♀️')}
+    </div>`
+},
+
+/* 11 — FIBRA */
+{
+  render:()=>`
+    <div class="eyebrow">Personalização · 2 de 3</div>
+    <h2>Com a fome cortada pela caneta, como está sua alimentação?</h2>
+    <div class="options">
+      ${opt('fibra','Como muito pouco — mal tenho fome','🍽️')}
+      ${opt('fibra','Como pouco e quase nada de verdura/fruta','🥪')}
+      ${opt('fibra','Como razoavelmente bem','🥗')}
+      ${opt('fibra','Como bem e com bastante fibra','🌾')}
+    </div>`
+},
+
+/* 12 — IDADE */
+{
+  render:()=>`
+    <div class="eyebrow">Personalização · 3 de 3</div>
+    <h2>Qual a sua faixa de idade?</h2>
+    <div class="options">
+      ${opt('idade','25 a 34 anos','')}
+      ${opt('idade','35 a 44 anos','')}
+      ${opt('idade','45 a 54 anos','')}
+      ${opt('idade','55 anos ou mais','')}
+    </div>`
+},
+
+/* 13 — LOADING */
+{
+  loading:true,
+  render:()=>`
+    <div class="load-wrap">
+      <div class="ring">
+        <svg width="110" height="110">
+          <circle cx="55" cy="55" r="48" stroke="#DCE8E3" stroke-width="9" fill="none"/>
+          <circle id="ringArc" cx="55" cy="55" r="48" stroke="#0E6B5C" stroke-width="9" fill="none"
+            stroke-linecap="round" stroke-dasharray="301.6" stroke-dashoffset="301.6"/>
+        </svg>
+        <div class="pct" id="ringPct">0%</div>
+      </div>
+      <div class="load-msg" id="loadMsg">Analisando suas respostas...</div>
+      <div class="load-check" id="loadChecks">
+        <div data-i="0"><span class="tick">✓</span> Classificando seu tipo na Escala de Bristol</div>
+        <div data-i="1"><span class="tick">✓</span> Cruzando com seu tempo de uso da caneta</div>
+        <div data-i="2"><span class="tick">✓</span> Avaliando fatores de risco (hidratação e fibra)</div>
+        <div data-i="3"><span class="tick">✓</span> Montando seu protocolo personalizado</div>
+      </div>
+    </div>`
+},
+
+/* 14 — RESULTADO */
+{
+  result:true,
+  render:()=>renderResult()
+}
+];
+
+/* ---------- helpers de template ---------- */
+function opt(key,label,emoji,meta){
+  return `<button class="opt" onclick="pick(this,'${key}',\`${label}\`)">
+    ${emoji?`<span class="emoji">${emoji}</span>`:''}
+    <span>${label}</span>
+  </button>`;
+}
+function mopt(label,emoji){
+  return `<button class="opt" onclick="togglePick(this,\`${label}\`)">
+    <span class="emoji">${emoji}</span><span>${label}</span>
+  </button>`;
+}
+function bristol(n,title,desc,tagCls,tagTxt){
+  return `<button class="bcard" onclick="pickBristol(this,${n})">
+    <div class="pic">${bristolSVG[n]}</div>
+    <div class="txt"><b>${title}</b><span>${desc}</span><span class="btag ${tagCls}">${tagTxt}</span></div>
+  </button>`;
+}
+function mech(n,title,desc,last){
+  return `<div class="mech-step">
+    <div class="mech-rail"><div class="mech-dot">${n}</div>${last?'':'<div class="mech-line"></div>'}</div>
+    <div class="mtxt"><b>${title}</b><span>${desc}</span></div>
+  </div>`;
+}
+
+/* ---------- navegação ---------- */
+const stage=document.getElementById('stage');
+const pfill=document.getElementById('pfill');
+const plabel=document.getElementById('plabel');
+
+function mount(){
+  stage.innerHTML='';
+  const s=steps[stepIndex];
+  const div=document.createElement('div');
+  div.className='screen';
+  div.innerHTML=s.render();
+  stage.appendChild(div);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>div.classList.add('active')));
+  const totalVisible=13;
+  const shown=Math.min(stepIndex+1,totalVisible);
+  pfill.style.width=(shown/totalVisible*100)+'%';
+  plabel.textContent=s.result?'Resultado pronto ✓':`Etapa ${shown} de ${totalVisible}`;
+  if(s.loading) runLoading();
+  if(s.result) setTimeout(placeGauge,300);
+  stage.scrollTop=0;
+}
+function next(){
+  if(stepIndex<steps.length-1){stepIndex++;mount();}
+}
+function pick(el,key,label){
+  el.parentElement.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[key]=label;
+  setTimeout(next,340);
+}
+function pickBristol(el,n){
+  el.parentElement.querySelectorAll('.bcard').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers.bristol=n;
+  setTimeout(next,380);
+}
+let multiSel=[];
+function togglePick(el,label){
+  el.classList.toggle('selected');
+  if(el.classList.contains('selected')) multiSel.push(label);
+  else multiSel=multiSel.filter(l=>l!==label);
+}
+function confirmMulti(){
+  answers.sintomas=multiSel.slice();
+  multiSel=[];
+  next();
+}
+
+/* ---------- loading sequence ---------- */
+function runLoading(){
+  const arc=document.getElementById('ringArc');
+  const pct=document.getElementById('ringPct');
+  const msg=document.getElementById('loadMsg');
+  const checks=[...document.querySelectorAll('#loadChecks div')];
+  const msgs=[
+    'Analisando suas respostas...',
+    'Classificando seu padrão intestinal...',
+    'Comparando com dados dos estudos SURMOUNT...',
+    'Seu protocolo está quase pronto...'
+  ];
+  let p=0;
+  const t=setInterval(()=>{
+    p+=1;
+    if(p>100){clearInterval(t);setTimeout(next,500);return;}
+    pct.textContent=p+'%';
+    arc.style.strokeDashoffset=301.6*(1-p/100);
+    const phase=Math.min(3,Math.floor(p/26));
+    msg.textContent=msgs[phase];
+    checks.forEach((c,i)=>{if(p>=(i+1)*24)c.classList.add('done');});
+  },42);
+}
+
+/* ---------- lógica de score ---------- */
+function computeScore(){
+  let score=0;
+  const b=answers.bristol||4;
+  if(b===1)score+=40; else if(b===2)score+=32; else if(b===3)score+=18; else if(b===4)score+=4; else score+=8;
+  const f=answers.freq||'';
+  if(f.includes('1 vez'))score+=25; else if(f.includes('2 a 3'))score+=18; else if(f.includes('4 a 6'))score+=8;
+  const s=(answers.sintomas||[]).filter(x=>x!=='Nenhum desses').length;
+  score+=Math.min(20,s*5);
+  if((answers.agua||'').includes('Menos de 1'))score+=8;
+  else if((answers.agua||'').includes('Não faço'))score+=5;
+  if((answers.fibra||'').includes('muito pouco'))score+=7;
+  else if((answers.fibra||'').includes('quase nada'))score+=5;
+  return Math.min(97,Math.max(12,score));
+}
+function severity(score){
+  if(score>=65)return{label:'SEVERO',color:'bad',frase:'constipação severa induzida por GLP-1'};
+  if(score>=40)return{label:'MODERADO',color:'bad',frase:'constipação moderada induzida por GLP-1'};
+  if(score>=22)return{label:'LEVE',color:'bad',frase:'lentificação intestinal em estágio inicial'};
+  return{label:'BAIXO',color:'good',frase:'trânsito intestinal preservado (por enquanto)'};
+}
+
+/* ---------- resultado ---------- */
+function renderResult(){
+  const score=computeScore();
+  const sev=severity(score);
+  const b=answers.bristol||4;
+  const bNames={1:'Tipo 1 — bolinhas duras',2:'Tipo 2 — compactado e granuloso',3:'Tipo 3 — com rachaduras',4:'Tipo 4 — ideal',5:'Tipo 5 — levemente solto',6:'Tipo 6 — pastoso',7:'Tipo 7 — líquido'};
+  const aguaBad=(answers.agua||'').includes('Menos')||(answers.agua||'').includes('Não faço');
+  const fibraBad=(answers.fibra||'').includes('pouco');
+  const nSint=(answers.sintomas||[]).filter(x=>x!=='Nenhum desses').length;
+
+  return `
+    <div class="result-badge"><span class="tag">Resultado da sua avaliação</span></div>
+    <h2 class="center">Seu diagnóstico funcional:<br><span style="color:var(--danger)">${sev.frase}</span></h2>
+
+    <div class="gauge-wrap">
+      <b style="font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-soft)">Índice de travamento intestinal</b>
+      <div style="font-size:44px;font-weight:800;color:var(--ink);margin-top:4px">${score}<span style="font-size:20px;color:var(--ink-soft)">/100</span></div>
+      <div class="gauge-bar"><div class="gauge-pin" id="gpin" style="left:6%"></div></div>
+      <div class="gauge-scale"><span>Normal</span><span>Moderado</span><span>Severo</span></div>
+    </div>
+
+    <div class="diag-list">
+      <div class="diag-row"><span>Escala de Bristol</span><b class="${b<=2?'bad':(b===4?'good':'')}">${bNames[b]}</b></div>
+      <div class="diag-row"><span>Frequência semanal</span><b class="${(answers.freq||'').includes('Todos')?'good':'bad'}">${answers.freq||'—'}</b></div>
+      <div class="diag-row"><span>Sintomas associados</span><b class="${nSint>=2?'bad':''}">${nSint} identificado${nSint===1?'':'s'}</b></div>
+      <div class="diag-row"><span>Hidratação</span><b class="${aguaBad?'bad':'good'}">${aguaBad?'Insuficiente ⚠️':'Adequada'}</b></div>
+      <div class="diag-row"><span>Aporte de fibras</span><b class="${fibraBad?'bad':'good'}">${fibraBad?'Baixo ⚠️':'Adequado'}</b></div>
+    </div>
+
+    <div class="proto">
+      <div class="p-eyebrow">Baseado nas suas respostas</div>
+      <h3>Protocolo Destrava™ — 21 dias para regular o intestino sem parar a caneta</h3>
+      <ul>
+        <li><span class="tick">✓</span> A sequência exata de hidratação que reidrata o bolo fecal (não é só "beber mais água")</li>
+        <li><span class="tick">✓</span> As 2 fibras certas na ordem certa — errar a ordem PIORA o inchaço em quem usa GLP-1</li>
+        <li><span class="tick">✓</span> O tipo de magnésio específico para trânsito intestinal (e a dose noturna ideal)</li>
+        <li><span class="tick">✓</span> O ajuste de horário das refeições que trabalha A FAVOR do esvaziamento lento</li>
+        <li><span class="tick">✓</span> Plano de emergência: o que fazer no dia 4 sem evacuar (sem laxante irritativo)</li>
+      </ul>
+    </div>
+
+    <button class="btn" onclick="goPV()">VER MEU PROTOCOLO PERSONALIZADO →</button>
+    <div class="scarcity">⏳ Seu resultado fica salvo por 15 minutos</div>
+    <div class="guarantee">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 3v6c0 5-3.5 9.3-8 11-4.5-1.7-8-6-8-11V5l8-3z" fill="#0E6B5C"/><path d="M8.5 12l2.4 2.4 4.6-4.8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span><b>Garantia incondicional de 30 dias</b> — intestino regulado ou seu dinheiro de volta.</span>
+    </div>
+
+    <div class="testi">
+      <div class="who">
+        <div class="avatar">C</div>
+        <div><b>Carla F., 52 — Belo Horizonte/MG</b><div class="stars">★★★★★</div></div>
+      </div>
+      <p>"Bristol tipo 1, 8 dias sem ir ao banheiro, chorando de dor. No 5º dia do protocolo, tudo mudou. Continuo no Mounjaro, já são 14kg a menos — agora sem sofrer."</p>
+    </div>
+
+    <p class="disclaimer">Este teste tem caráter informativo e não substitui avaliação médica. O Protocolo Destrava™ é um programa de hábitos alimentares e suplementação natural. Não interrompa nem altere a dose da sua medicação sem orientação do seu médico. Se você está há mais de 7 dias sem evacuar, com dor intensa ou sangramento, procure atendimento médico.</p>
+  `;
+}
+function placeGauge(){
+  const pin=document.getElementById('gpin');
+  if(!pin)return;
+  const score=computeScore();
+  setTimeout(()=>{pin.style.left=score+'%';},250);
+}
+function goPV(){
+  alert('→ Redirecionar para a Página de Vendas do Protocolo Destrava™\n\n(No funil real, aqui vai o link da PV com os parâmetros do quiz: bristol=' + (answers.bristol||'-') + ', score=' + computeScore() + ')');
+}
+
+mount();
+</script>
+</body>
+</html>

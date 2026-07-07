@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Teste do Intestino de Caneta™ | Protocolo Destrava</title>
+<style>
+  :root{
+    --bg:#F4F8F6;
+    --card:#FFFFFF;
+    --ink:#16302B;
+    --ink-soft:#4E6660;
+    --teal:#0E6B5C;
+    --teal-deep:#0A4A40;
+    --cta:#F26B3A;
+    --cta-deep:#D9541F;
+    --amber:#FFB930;
+    --danger:#C9402E;
+    --green:#1E9E6A;
+    --line:#DCE8E3;
+    --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:var(--bg);
+    position:relative;
+  }
+  /* ---------- header ---------- */
+  .topbar{padding:14px 20px 10px;text-align:center;}
+  .brand{font-size:13px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--teal-deep);}
+  .brand span{color:var(--cta);}
+  .progress-wrap{padding:0 20px 6px;}
+  .progress-track{height:6px;background:var(--line);border-radius:99px;overflow:hidden;}
+  .progress-fill{height:100%;width:4%;background:linear-gradient(90deg,var(--teal),#1AA88F);border-radius:99px;transition:width .45s cubic-bezier(.4,0,.2,1);}
+  .progress-label{font-size:11px;color:var(--ink-soft);text-align:right;margin-top:5px;font-weight:600;}
+  /* ---------- screens ---------- */
+  .stage{flex:1;position:relative;overflow:hidden;}
+  .screen{
+    position:absolute;inset:0;
+    padding:18px 20px 32px;
+    overflow-y:auto;
+    opacity:0;transform:translateX(28px);
+    pointer-events:none;
+    transition:opacity .35s ease,transform .35s ease;
+    display:flex;flex-direction:column;
+  }
+  .screen.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .eyebrow{font-size:11px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:var(--teal);margin-bottom:10px;}
+  h1{font-size:24px;line-height:1.25;font-weight:800;letter-spacing:-.3px;margin-bottom:10px;}
+  h2{font-size:21px;line-height:1.3;font-weight:800;letter-spacing:-.2px;margin-bottom:8px;}
+  .sub{font-size:15px;line-height:1.55;color:var(--ink-soft);margin-bottom:18px;}
+  .sub b{color:var(--ink);}
+  mark{background:linear-gradient(transparent 55%, #FFE3A6 55%);color:inherit;padding:0 2px;}
+  /* ---------- options ---------- */
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .opt{
+    background:var(--card);border:2px solid var(--line);border-radius:var(--radius);
+    padding:15px 16px;font-size:15px;font-weight:600;color:var(--ink);
+    cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;
+    line-height:1.4;
+    transition:border-color .15s,transform .12s,background .15s;
+  }
+  .opt:active{transform:scale(.98);}
+  .opt.selected{border-color:var(--teal);background:#EAF5F1;}
+  .opt .emoji{font-size:22px;flex-shrink:0;}
+  /* escala 0-10 */
+  .scale-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
+  .scale-btn{
+    background:var(--card);border:2px solid var(--line);border-radius:12px;
+    padding:13px 0;font-size:16px;font-weight:800;color:var(--ink);cursor:pointer;
+    transition:border-color .15s,background .15s,transform .12s;
+  }
+  .scale-btn:active{transform:scale(.94);}
+  .scale-btn.selected{border-color:var(--teal);background:#EAF5F1;color:var(--teal-deep);}
+  .scale-legend{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-soft);font-weight:700;margin-top:8px;}
+  /* ---------- bristol ---------- */
+  .bristol-note{
+    display:flex;align-items:center;gap:10px;
+    background:#EAF5F1;border:1px solid #CBE4DB;border-radius:12px;
+    padding:10px 12px;margin-bottom:14px;
+  }
+  .bristol-note p{font-size:12.5px;line-height:1.45;color:var(--teal-deep);font-weight:600;}
+  .bristol-grid{display:flex;flex-direction:column;gap:10px;}
+  .bcard{
+    background:var(--card);border:2px solid var(--line);border-radius:var(--radius);
+    padding:12px 14px;display:flex;align-items:center;gap:14px;cursor:pointer;
+    transition:border-color .15s,transform .12s,background .15s;
+  }
+  .bcard:active{transform:scale(.98);}
+  .bcard.selected{border-color:var(--teal);background:#EAF5F1;}
+  .bcard .pic{width:74px;height:46px;flex-shrink:0;background:#F7F3EC;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+  .bcard .txt b{font-size:14.5px;display:block;}
+  .bcard .txt span{font-size:12.5px;color:var(--ink-soft);line-height:1.4;display:block;margin-top:2px;}
+  .btag{font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;border-radius:6px;padding:2px 7px;display:inline-block;margin-top:5px;}
+  .btag.hard{background:#FBE3DE;color:var(--danger);}
+  .btag.ok{background:#DFF2E8;color:#177A4C;}
+  .btag.loose{background:#FFF1D6;color:#9A6A00;}
+  /* ---------- info / prova social ---------- */
+  .info-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 18px;margin-bottom:14px;}
+  .stat-hero{
+    text-align:center;padding:22px 16px;
+    background:linear-gradient(160deg,#0E6B5C,#0A4A40);color:#fff;
+    border-radius:var(--radius);margin-bottom:14px;
+  }
+  .stat-hero .big{font-size:46px;font-weight:800;letter-spacing:-1px;line-height:1;}
+  .stat-hero .big small{font-size:20px;font-weight:700;}
+  .stat-hero p{font-size:14px;margin-top:8px;opacity:.92;line-height:1.5;}
+  .src{font-size:11px;color:var(--ink-soft);text-align:center;margin-top:10px;}
+  .testi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-top:14px;}
+  .testi .who{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#FFB930,#F26B3A);color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .testi .who b{font-size:14px;display:block;}
+  .stars{color:#FFB930;font-size:12px;letter-spacing:1px;}
+  .testi p{font-size:13.5px;line-height:1.55;color:var(--ink-soft);font-style:italic;}
+  /* ---------- botões ---------- */
+  .btn{
+    width:100%;border:none;border-radius:14px;padding:17px;
+    font-size:16.5px;font-weight:800;letter-spacing:.2px;cursor:pointer;color:#fff;
+    background:linear-gradient(180deg,var(--cta),var(--cta-deep));
+    box-shadow:0 6px 18px rgba(242,107,58,.35);
+    transition:transform .12s;margin-top:auto;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn.teal{background:linear-gradient(180deg,#128268,var(--teal-deep));box-shadow:0 6px 18px rgba(14,107,92,.3);}
+  .btn-spacer{margin-top:18px;}
+  /* ---------- loading ---------- */
+  .load-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:22px;}
+  .ring{width:110px;height:110px;position:relative;}
+  .ring svg{transform:rotate(-90deg);}
+  .ring .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:var(--teal-deep);}
+  .load-msg{font-size:15px;font-weight:600;color:var(--ink);min-height:44px;line-height:1.5;}
+  .load-check{font-size:13px;color:var(--ink-soft);display:flex;flex-direction:column;gap:8px;align-items:flex-start;}
+  .load-check div{display:flex;gap:8px;align-items:center;opacity:.25;transition:opacity .4s;}
+  .load-check div.done{opacity:1;}
+  .load-check .tick{color:var(--teal);font-weight:800;}
+  /* ---------- resultado / gráfico ---------- */
+  .result-badge{text-align:center;margin-bottom:14px;}
+  .result-badge .tag{display:inline-block;background:#DFF2E8;color:#177A4C;font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;border-radius:99px;}
+  .chart-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 14px 12px;margin-bottom:14px;}
+  .chart-card h3{font-size:14px;text-align:center;margin-bottom:4px;}
+  .chart-card .ch-sub{font-size:12px;color:var(--ink-soft);text-align:center;margin-bottom:10px;}
+  /* ---------- PV ---------- */
+  .sticky-cta{
+    position:sticky;top:0;z-index:50;
+    padding:10px 14px;
+    background:rgba(244,248,246,.95);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+    display:none;
+  }
+  .sticky-cta.show{display:block;}
+  .sticky-cta button{
+    width:100%;border:none;border-radius:12px;padding:14px;
+    font-size:15px;font-weight:800;color:#fff;cursor:pointer;
+    background:linear-gradient(180deg,var(--cta),var(--cta-deep));
+    animation:pulse 1.6s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(242,107,58,.55);}
+    70%{box-shadow:0 0 0 14px rgba(242,107,58,0);}
+    100%{box-shadow:0 0 0 0 rgba(242,107,58,0);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .sticky-cta button{animation:none;}
+  }
+  .pv-section{margin-bottom:22px;}
+  .before-after{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;}
+  .ba-card{border-radius:var(--radius);padding:16px 12px;text-align:center;}
+  .ba-card.before{background:#FDF0EC;border:1px solid #F3CFC5;}
+  .ba-card.after{background:#DFF2E8;border:1px solid #BCE3D0;}
+  .ba-card .ba-label{font-size:10.5px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+  .ba-card.before .ba-label{color:var(--danger);}
+  .ba-card.after .ba-label{color:#177A4C;}
+  .ba-card ul{list-style:none;text-align:left;display:flex;flex-direction:column;gap:6px;}
+  .ba-card li{font-size:12px;line-height:1.4;display:flex;gap:6px;align-items:flex-start;}
+  .price-box{
+    background:var(--card);border:2px solid var(--teal);border-radius:var(--radius);
+    padding:20px 16px;text-align:center;
+  }
+  .price-box .old{font-size:16px;color:var(--ink-soft);text-decoration:line-through;font-weight:600;}
+  .price-box .new{font-size:44px;font-weight:800;color:var(--teal-deep);letter-spacing:-1px;line-height:1.1;}
+  .price-box .new small{font-size:18px;}
+  .price-box .parc{font-size:13px;color:var(--ink-soft);margin-top:4px;font-weight:600;}
+  .off-badge{
+    display:inline-block;background:var(--danger);color:#fff;
+    font-size:12px;font-weight:800;padding:5px 12px;border-radius:99px;
+    margin-bottom:8px;letter-spacing:.5px;
+  }
+  .deliv{display:flex;flex-direction:column;gap:10px;}
+  .deliv-item{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px;display:flex;gap:12px;align-items:flex-start;
+  }
+  .deliv-item .ic{
+    width:42px;height:42px;border-radius:12px;flex-shrink:0;
+    background:#EAF5F1;display:flex;align-items:center;justify-content:center;font-size:20px;
+  }
+  .deliv-item .dt b{font-size:14px;display:block;line-height:1.35;}
+  .deliv-item .dt span{font-size:12.5px;color:var(--ink-soft);line-height:1.45;display:block;margin-top:3px;}
+  .deliv-item .dt .val{font-size:12px;font-weight:800;margin-top:5px;display:block;}
+  .deliv-item .dt .val s{color:var(--ink-soft);font-weight:600;}
+  .deliv-item .dt .val em{color:#177A4C;font-style:normal;}
+  .bonus-tag{display:inline-block;background:#FFF1D6;color:#9A6A00;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:2px 8px;border-radius:6px;margin-bottom:4px;}
+  .total-line{
+    background:#0A4A40;color:#fff;border-radius:var(--radius);
+    padding:16px;text-align:center;margin-top:10px;
+  }
+  .total-line .t1{font-size:13px;opacity:.85;}
+  .total-line .t1 s{opacity:.9;}
+  .total-line .t2{font-size:22px;font-weight:800;margin-top:2px;}
+  .benefits{display:flex;flex-direction:column;gap:9px;}
+  .benefit{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:13px 14px;font-size:13.5px;line-height:1.5;
+    display:flex;gap:10px;align-items:flex-start;
+  }
+  .benefit .tick{color:var(--green);font-weight:800;flex-shrink:0;font-size:15px;}
+  .guarantee-box{
+    background:var(--card);border:2px dashed var(--teal);border-radius:var(--radius);
+    padding:20px 16px;text-align:center;
+  }
+  .guarantee-box h3{font-size:17px;margin:10px 0 6px;}
+  .guarantee-box p{font-size:13.5px;color:var(--ink-soft);line-height:1.55;}
+  .faq{display:flex;flex-direction:column;gap:9px;}
+  .faq-item{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .faq-q{
+    width:100%;background:none;border:none;text-align:left;cursor:pointer;
+    padding:14px;font-size:14px;font-weight:700;color:var(--ink);
+    display:flex;justify-content:space-between;gap:10px;align-items:center;
+  }
+  .faq-q .chev{transition:transform .25s;color:var(--teal);font-weight:800;flex-shrink:0;}
+  .faq-item.open .chev{transform:rotate(90deg);}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+  .faq-a p{padding:0 14px 14px;font-size:13.5px;line-height:1.55;color:var(--ink-soft);}
+  .faq-item.open .faq-a{max-height:300px;}
+  .pv-h{font-size:19px;font-weight:800;text-align:center;margin-bottom:14px;letter-spacing:-.2px;}
+  .disclaimer{font-size:10.5px;color:#9AAEA8;line-height:1.5;text-align:center;margin-top:20px;padding:0 6px 30px;}
+  .scarcity{text-align:center;font-size:12.5px;color:var(--danger);font-weight:700;margin-top:10px;}
+  .social-count{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-top:14px;}
+  .dots{display:flex;}
+  .dots i{width:24px;height:24px;border-radius:50%;border:2px solid var(--bg);margin-left:-8px;background:linear-gradient(135deg,#B9D8CE,#7FB8A8);display:block;}
+  .dots i:first-child{margin-left:0;}
+  .center{text-align:center;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sticky-cta" id="stickyCta">
+    <button onclick="goCheckout()">DESTRAVAR MEU INTESTINO — R$37 →</button>
+  </div>
+  <div class="topbar">
+    <div class="brand">TESTE DO <span>INTESTINO DE CANETA</span>™</div>
+  </div>
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-track"><div class="progress-fill" id="pfill"></div></div>
+    <div class="progress-label" id="plabel">Etapa 1 de 16</div>
+  </div>
+
+  <div class="stage" id="stage"></div>
+</div>
+
+<script>
+/* =========================================================
+   TESTE DO INTESTINO DE CANETA™ — v2
+   Estrutura em 5 PARTES (framework Low Ticket):
+   P1 Conexão inicial + básicas (+ prova social pós-idade + motivação)
+   P2 Dores + identificação (respostas compreensivas)
+   P3 Desejo (3 perguntas + future pacing + prova social)
+   P4 Personalização (Bristol, frequência, água, fibra, kg)
+   P5 Loading → solução pronta c/ GRÁFICO → Página de Vendas
+========================================================= */
+
+const answers={};
+let stepIndex=0;
+
+/* ---------- SVGs Bristol ---------- */
+const B="#8A6244";
+const bristolSVG={
+  1:`<svg width="64" height="34" viewBox="0 0 64 34"><g fill="${B}"><circle cx="10" cy="12" r="5.5"/><circle cx="24" cy="20" r="5"/><circle cx="38" cy="10" r="5.5"/><circle cx="52" cy="18" r="5"/><circle cx="30" cy="28" r="4"/></g></svg>`,
+  2:`<svg width="64" height="34" viewBox="0 0 64 34"><path fill="${B}" d="M8 17c0-6 5-10 10-9 3-4 9-4 12 0 4-3 10-2 12 2 5-1 10 2 10 7s-5 8-10 7c-2 4-8 5-12 2-3 4-9 4-12 0-5 1-10-3-10-9z"/></svg>`,
+  3:`<svg width="64" height="34" viewBox="0 0 64 34"><rect x="6" y="9" width="52" height="16" rx="8" fill="${B}"/><g stroke="#6B4A31" stroke-width="1.6" stroke-linecap="round"><line x1="18" y1="11" x2="16" y2="17"/><line x1="30" y1="12" x2="28" y2="19"/><line x1="42" y1="11" x2="40" y2="17"/><line x1="52" y1="13" x2="50" y2="19"/></g></svg>`,
+  4:`<svg width="64" height="34" viewBox="0 0 64 34"><rect x="6" y="10" width="52" height="14" rx="7" fill="${B}"/></svg>`,
+  5:`<svg width="64" height="34" viewBox="0 0 64 34"><g fill="${B}"><ellipse cx="14" cy="14" rx="8" ry="6"/><ellipse cx="34" cy="20" rx="9" ry="6.5"/><ellipse cx="52" cy="12" rx="7" ry="5.5"/></g></svg>`,
+  6:`<svg width="64" height="34" viewBox="0 0 64 34"><g fill="${B}" opacity=".85"><path d="M10 14c3-4 8-3 9 1 2 3-1 7-5 6s-6-4-4-7z"/><path d="M26 20c2-5 9-4 10 0 1 4-3 8-7 6-3-1-4-4-3-6z"/><path d="M44 12c3-3 9-2 9 2 1 4-4 7-7 5-3-1-4-5-2-7z"/></g></svg>`,
+  7:`<svg width="64" height="34" viewBox="0 0 64 34"><path fill="${B}" opacity=".55" d="M6 20c6-6 14-6 20 0s14 6 20 0 10-4 12 0v8H6z"/><ellipse cx="20" cy="12" rx="3" ry="2" fill="${B}" opacity=".4"/><ellipse cx="44" cy="10" rx="2.5" ry="1.8" fill="${B}" opacity=".4"/></svg>`
+};
+
+/* =========================================================
+   ETAPAS
+========================================================= */
+const steps=[
+
+/* ============ PARTE 1 — CONEXÃO INICIAL + BÁSICAS ============ */
+
+/* 1. Entrada + segmentação */
+{
+  render:()=>`
+    <div class="eyebrow">Avaliação gratuita · 2 minutos</div>
+    <h1>Seu intestino <mark>travou</mark> depois que você começou a caneta?</h1>
+    <p class="sub">Responda algumas perguntas rápidas baseadas na <b>Escala de Bristol</b> — o padrão usado por gastroenterologistas — e receba um <b>plano personalizado</b> para destravar sem interromper o tratamento.</p>
+    <div class="options">
+      ${opt('caneta','Uso Mounjaro (tirzepatida)','💉')}
+      ${opt('caneta','Uso Ozempic / Wegovy (semaglutida)','💉')}
+      ${opt('caneta','Uso Saxenda ou manipulado','💉')}
+      ${opt('caneta','Vou começar em breve','🕐')}
+    </div>
+    <div class="social-count">
+      <div class="dots"><i></i><i></i><i></i><i></i></div>
+      <span>+3.400 avaliações concluídas esta semana</span>
+    </div>`
+},
+
+/* 2. Idade */
+{
+  render:()=>`
+    <div class="eyebrow">Sobre você</div>
+    <h2>Qual a sua faixa de idade?</h2>
+    <p class="sub">O trânsito intestinal muda com a idade — isso ajusta o seu plano.</p>
+    <div class="options">
+      ${opt('idade','25 a 34 anos','')}
+      ${opt('idade','35 a 44 anos','')}
+      ${opt('idade','45 a 54 anos','')}
+      ${opt('idade','55 anos ou mais','')}
+    </div>`
+},
+
+/* 3. PROVA SOCIAL pós-idade (dinâmica) */
+{
+  info:true,
+  render:()=>{
+    const faixa=(answers.idade||'').replace(' anos','');
+    return `
+    <div class="eyebrow">Você está no lugar certo</div>
+    <div class="stat-hero">
+      <div class="big">+2.100</div>
+      <p>mulheres na faixa dos <b>${faixa||'40'}</b> que usam caneta emagrecedora já destravaram o intestino com o método do <b>Protocolo Destrava™</b> — sem parar a medicação e sem laxante todo dia.</p>
+    </div>
+    <div class="testi">
+      <div class="who">
+        <div class="avatar">R</div>
+        <div><b>Renata M., 46 — Goiânia/GO</b><div class="stars">★★★★★</div></div>
+      </div>
+      <p>"Eu já tinha eliminado 9kg com o Mounjaro, mas passava 5 dias sem ir ao banheiro. Achei que era o preço a pagar. Não era. Em 2 semanas meu intestino voltou ao normal — sem parar a caneta."</p>
+    </div>
+    <button class="btn teal btn-spacer" onclick="next()">CONTINUAR →</button>`;
+  }
+},
+
+/* 4. Objetivo dos sonhos */
+{
+  render:()=>`
+    <div class="eyebrow">Seu objetivo</div>
+    <h2>Qual é o seu grande objetivo com a caneta?</h2>
+    <div class="options">
+      ${opt('objetivo','Eliminar de 5 a 10kg','🎯')}
+      ${opt('objetivo','Eliminar de 10 a 20kg','🎯')}
+      ${opt('objetivo','Eliminar mais de 20kg','🎯')}
+      ${opt('objetivo','Manter o peso que já conquistei','🛡️')}
+    </div>`
+},
+
+/* 5. Motivação (urgência do objetivo) */
+{
+  render:()=>`
+    <div class="eyebrow">Sua motivação</div>
+    <h2>Qual é a sua maior motivação para chegar lá?</h2>
+    <div class="options">
+      ${opt('motivacao','Voltar a me sentir bem com meu corpo','💛')}
+      ${opt('motivacao','Minha saúde — exames e disposição','🩺')}
+      ${opt('motivacao','Um evento importante chegando','📅')}
+      ${opt('motivacao','Provar pra mim mesma que consigo','🔥')}
+    </div>`
+},
+
+/* ============ PARTE 2 — DORES + IDENTIFICAÇÃO ============ */
+
+/* 6. Dor principal (com respostas compreensivas) */
+{
+  render:()=>`
+    <div class="eyebrow">Vamos falar do problema</div>
+    <h2>Como você se sente em relação ao seu intestino hoje?</h2>
+    <div class="options">
+      ${opt('dor1','Frustrada — emagrecer não devia doer tanto','😤')}
+      ${opt('dor1','Inchada e pesada, mesmo comendo pouco','🎈')}
+      ${opt('dor1','Envergonhada de falar disso com alguém','🙈')}
+      ${opt('dor1','Mal, mas decidida a resolver isso em 2026','💪')}
+    </div>`
+},
+
+/* 7. O que te impediu até agora (identificação) */
+{
+  render:()=>`
+    <div class="eyebrow">Seja sincera</div>
+    <h2>O que te impediu de resolver o intestino preso até agora?</h2>
+    <div class="options">
+      ${opt('dor2','Ninguém me explicou que era efeito da caneta','❓')}
+      ${opt('dor2','Já tentei de tudo e nada funcionou direito','😞')}
+      ${opt('dor2','Tenho medo de precisar parar o tratamento','😟')}
+      ${opt('dor2','Achei que ia passar sozinho com o tempo','⏳')}
+    </div>`
+},
+
+/* 8. MECANISMO DO PROBLEMA (resposta compreensiva à dor) */
+{
+  info:true,
+  render:()=>`
+    <div class="eyebrow">A verdade que ninguém te contou</div>
+    <h2>Não é culpa sua. É o mecanismo da caneta.</h2>
+    <div class="info-card">
+      <p style="font-size:14.5px;line-height:1.6;color:var(--ink-soft)">
+        O GLP-1 que corta seu apetite <b style="color:var(--ink)">desacelera todo o trato digestivo</b>. O bolo fecal fica mais tempo parado no intestino grosso — e quanto mais tempo parado, <b style="color:var(--ink)">mais água ele perde</b>.<br><br>
+        Resultado: fezes ressecadas, duras, esforço e dias sem ir ao banheiro. Nos estudos clínicos SURMOUNT, até <b style="color:var(--danger)">17% dos usuários de tirzepatida</b> desenvolveram constipação — com semaglutida, perto de <b style="color:var(--danger)">24%</b>.
+      </p>
+    </div>
+    <p class="src">Fonte: ensaios clínicos SURMOUNT-1 e STEP</p>
+    <p class="sub" style="margin-top:12px">A boa notícia? Como a causa é <mark>mecânica e previsível</mark>, ela responde a um protocolo específico — <b>sem reduzir a dose</b> e sem depender de laxante.</p>
+    <button class="btn teal" onclick="next()">ISSO FAZ SENTIDO — CONTINUAR →</button>`
+},
+
+/* ============ PARTE 3 — DESEJO ============ */
+
+/* 9. Desejo 1: escala 0-10 (leveza) */
+{
+  scale:true,
+  render:()=>`
+    <div class="eyebrow">Agora, sobre o que você quer</div>
+    <h2>De 0 a 10, quão leve e desinchada você se sente hoje?</h2>
+    <p class="sub">Seja honesta — isso calibra seu ponto de partida no gráfico final.</p>
+    <div class="scale-grid">
+      ${[0,1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="scale-btn" onclick="pickScale(this,${n})">${n}</button>`).join('')}
+    </div>
+    <div class="scale-legend"><span>Travada e inchada</span><span>Leve e regulada</span></div>`
+},
+
+/* 10. Prova social pós-desejo */
+{
+  info:true,
+  render:()=>{
+    const n=answers.leveza!==undefined?answers.leveza:4;
+    return `
+    <div class="eyebrow">Olha só</div>
+    <h2>A maioria das mulheres começa exatamente onde você está.</h2>
+    <div class="info-card center">
+      <p style="font-size:14.5px;line-height:1.6;color:var(--ink-soft)">Quem entra no protocolo com nota <b style="color:var(--danger)">${n}</b> de leveza costuma relatar nota <b style="color:var(--green)">8 ou mais</b> já na terceira semana — indo ao banheiro todos os dias, sem esforço e sem inchaço.</p>
+    </div>
+    <div class="testi">
+      <div class="who">
+        <div class="avatar">C</div>
+        <div><b>Carla F., 52 — Belo Horizonte/MG</b><div class="stars">★★★★★</div></div>
+      </div>
+      <p>"Bristol tipo 1, 8 dias sem ir ao banheiro, chorando de dor. No 5º dia do protocolo, tudo mudou. Continuo no Mounjaro, já são 14kg a menos — agora sem sofrer."</p>
+    </div>
+    <button class="btn teal btn-spacer" onclick="next()">QUERO ISSO PRA MIM →</button>`;
+  }
+},
+
+/* 11. Desejo 2: o que mudaria */
+{
+  render:()=>`
+    <div class="eyebrow">Imagine</div>
+    <h2>O que mudaria na sua vida com o intestino funcionando todo dia?</h2>
+    <div class="options">
+      ${opt('desejo2','Acordar desinchada e com a barriga leve','🌅')}
+      ${opt('desejo2','Continuar a caneta sem sofrimento até a meta','🏁')}
+      ${opt('desejo2','Vestir minhas roupas sem me sentir estufada','👗')}
+      ${opt('desejo2','Parar de planejar o dia em volta do banheiro','🕊️')}
+    </div>`
+},
+
+/* 12. Desejo 3: FUTURE PACING */
+{
+  render:()=>`
+    <div class="eyebrow">Projete os próximos 3 meses</div>
+    <h2>Como você quer estar daqui a 90 dias?</h2>
+    <div class="options">
+      ${opt('future','Mais magra E indo ao banheiro todo dia, sem dor','✨')}
+      ${opt('future','Com a meta de peso batida e o intestino regulado','🏆')}
+      ${opt('future','Leve, desinchada e sem depender de laxante','🍃')}
+    </div>`
+},
+
+/* ============ PARTE 4 — PERSONALIZAÇÃO ============ */
+
+/* 13. Escala de Bristol */
+{
+  render:()=>`
+    <div class="eyebrow">Personalização · Escala de Bristol</div>
+    <h2>Nos últimos 7 dias, qual formato descreve melhor as suas fezes?</h2>
+    <div class="bristol-note">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#0E6B5C"/><path d="M12 7v6M12 16.5v.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <p>A Escala de Bristol é a classificação clínica usada por gastroenterologistas no mundo todo para avaliar o trânsito intestinal.</p>
+    </div>
+    <div class="bristol-grid">
+      ${bristol(1,'Tipo 1 — Bolinhas duras e separadas','Difíceis de eliminar','hard','Constipação severa')}
+      ${bristol(2,'Tipo 2 — Linguiça granulosa e compactada','Ressecado','hard','Constipação')}
+      ${bristol(3,'Tipo 3 — Linguiça com rachaduras','Trânsito lentificado','loose','Tendência a ressecar')}
+      ${bristol(4,'Tipo 4 — Lisa e macia','O padrão ideal','ok','Normal')}
+      ${bristol(5,'Tipo 5 — Pedaços macios definidos','Trânsito acelerado','loose','Levemente solto')}
+      ${bristol(6,'Tipo 6 — Pedaços aerados irregulares','Pastoso','loose','Solto')}
+      ${bristol(7,'Tipo 7 — Totalmente líquida','Sem partes sólidas','loose','Diarreia')}
+    </div>`
+},
+
+/* 14. Frequência */
+{
+  render:()=>`
+    <div class="eyebrow">Personalização · 2 de 5</div>
+    <h2>Quantas vezes você foi ao banheiro na última semana?</h2>
+    <div class="options">
+      ${opt('freq','Todos os dias','✅')}
+      ${opt('freq','4 a 6 vezes','🙂')}
+      ${opt('freq','2 a 3 vezes','😐')}
+      ${opt('freq','1 vez ou nenhuma','😣')}
+    </div>`
+},
+
+/* 15. Água */
+{
+  render:()=>`
+    <div class="eyebrow">Personalização · 3 de 5</div>
+    <h2>Quanta água você bebe por dia?</h2>
+    <div class="options">
+      ${opt('agua','Menos de 1 litro','🥛')}
+      ${opt('agua','1 a 2 litros','💧')}
+      ${opt('agua','Mais de 2 litros','🚰')}
+      ${opt('agua','Não faço ideia','🤷‍♀️')}
+    </div>`
+},
+
+/* 16. Fibra / alimentação */
+{
+  render:()=>`
+    <div class="eyebrow">Personalização · 4 de 5</div>
+    <h2>Com a fome cortada pela caneta, como está sua alimentação?</h2>
+    <div class="options">
+      ${opt('fibra','Como muito pouco — mal tenho fome','🍽️')}
+      ${opt('fibra','Como pouco e quase nada de verdura/fruta','🥪')}
+      ${opt('fibra','Como razoavelmente bem','🥗')}
+      ${opt('fibra','Como bem e com bastante fibra','🌾')}
+    </div>`
+},
+
+/* 17. Kg já eliminados (protege a conquista) */
+{
+  render:()=>`
+    <div class="eyebrow">Personalização · 5 de 5</div>
+    <h2>Quantos quilos você já eliminou com a caneta?</h2>
+    <div class="options">
+      ${opt('kg','Ainda não comecei a perder','—')}
+      ${opt('kg','1 a 5kg','⚖️')}
+      ${opt('kg','5 a 10kg','⚖️')}
+      ${opt('kg','Mais de 10kg','🏆')}
+    </div>`
+},
+
+/* ============ PARTE 5 — LOADING → SOLUÇÃO → PV ============ */
+
+/* 18. Loading */
+{
+  loading:true,
+  render:()=>`
+    <div class="load-wrap">
+      <div class="ring">
+        <svg width="110" height="110">
+          <circle cx="55" cy="55" r="48" stroke="#DCE8E3" stroke-width="9" fill="none"/>
+          <circle id="ringArc" cx="55" cy="55" r="48" stroke="#0E6B5C" stroke-width="9" fill="none"
+            stroke-linecap="round" stroke-dasharray="301.6" stroke-dashoffset="301.6"/>
+        </svg>
+        <div class="pct" id="ringPct">0%</div>
+      </div>
+      <div class="load-msg" id="loadMsg">Analisando suas respostas...</div>
+      <div class="load-check" id="loadChecks">
+        <div data-i="0"><span class="tick">✓</span> Classificando seu tipo na Escala de Bristol</div>
+        <div data-i="1"><span class="tick">✓</span> Cruzando com seus dados de hidratação e fibras</div>
+        <div data-i="2"><span class="tick">✓</span> Ajustando o plano ao seu objetivo de peso</div>
+        <div data-i="3"><span class="tick">✓</span> Montando seu Protocolo Destrava™ personalizado</div>
+      </div>
+    </div>`
+},
+
+/* 19. SOLUÇÃO PRONTA + GRÁFICO (hoje → 21 dias) */
+{
+  info:true,
+  render:()=>{
+    const score=computeScore();
+    const sev=severity(score);
+    const b=answers.bristol||2;
+    return `
+    <div class="result-badge"><span class="tag">✓ Seu plano personalizado está pronto</span></div>
+    <h2 class="center">Diagnóstico funcional:<br><span style="color:var(--danger)">${sev.frase}</span></h2>
+    <p class="sub center" style="margin-top:6px">Bristol <b>tipo ${b}</b> · Índice de travamento: <b>${score}/100</b></p>
+
+    <div class="chart-card">
+      <h3>Sua projeção com o Protocolo Destrava™</h3>
+      <div class="ch-sub">Índice de travamento intestinal — 21 dias</div>
+      ${chartSVG(score)}
+    </div>
+
+    <p class="sub center">Seguindo o protocolo do jeito certo, a projeção é sair de <b style="color:var(--danger)">${score}/100</b> hoje para a <b style="color:var(--green)">zona regulada (abaixo de 25)</b> em 3 semanas — indo ao banheiro todos os dias, <b>sem parar a caneta</b>.</p>
+
+    <button class="btn" onclick="next()">VER MEU PROTOCOLO COMPLETO →</button>`;
+  }
+},
+
+/* 20. PÁGINA DE VENDAS — estrutura campeã */
+{
+  pv:true,
+  render:()=>renderPV()
+}
+];
+
+/* ---------- helpers ---------- */
+function opt(key,label,emoji){
+  return `<button class="opt" onclick="pick(this,'${key}',\`${label}\`)">
+    ${emoji?`<span class="emoji">${emoji}</span>`:''}
+    <span>${label}</span>
+  </button>`;
+}
+function bristol(n,title,desc,tagCls,tagTxt){
+  return `<button class="bcard" onclick="pickBristol(this,${n})">
+    <div class="pic">${bristolSVG[n]}</div>
+    <div class="txt"><b>${title}</b><span>${desc}</span><span class="btag ${tagCls}">${tagTxt}</span></div>
+  </button>`;
+}
+
+/* ---------- gráfico SVG (hoje → dia 21) ---------- */
+function chartSVG(score){
+  const W=380,H=190,padL=34,padR=14,padT=16,padB=30;
+  const xs=[0,7,14,21];
+  const proj=[score,Math.round(score*.62),Math.round(score*.34),Math.min(18,Math.round(score*.18))];
+  const x=v=>padL+(v/21)*(W-padL-padR);
+  const y=v=>padT+(1-v/100)*(H-padT-padB);
+  const pts=xs.map((d,i)=>`${x(d)},${y(proj[i])}`).join(' ');
+  const area=`${x(0)},${y(proj[0])} ${pts} ${x(21)},${H-padB} ${x(0)},${H-padB}`;
+  return `
+  <svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">
+    <defs>
+      <linearGradient id="gArea" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#F26B3A" stop-opacity=".28"/>
+        <stop offset="100%" stop-color="#1E9E6A" stop-opacity=".08"/>
+      </linearGradient>
+    </defs>
+    <!-- zona regulada -->
+    <rect x="${padL}" y="${y(25)}" width="${W-padL-padR}" height="${(H-padB)-y(25)}" fill="#DFF2E8" opacity=".7"/>
+    <text x="${W-padR-4}" y="${y(25)+16}" font-size="10" fill="#177A4C" font-weight="700" text-anchor="end">ZONA REGULADA</text>
+    <!-- grid -->
+    ${[0,25,50,75,100].map(v=>`
+      <line x1="${padL}" y1="${y(v)}" x2="${W-padR}" y2="${y(v)}" stroke="#DCE8E3" stroke-width="1"/>
+      <text x="${padL-6}" y="${y(v)+3.5}" font-size="9.5" fill="#4E6660" text-anchor="end">${v}</text>`).join('')}
+    <!-- área + linha -->
+    <polygon points="${area}" fill="url(#gArea)"/>
+    <polyline points="${pts}" fill="none" stroke="#0E6B5C" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- pontos -->
+    ${xs.map((d,i)=>`
+      <circle cx="${x(d)}" cy="${y(proj[i])}" r="6" fill="${i===0?'#C9402E':(i===3?'#1E9E6A':'#0E6B5C')}" stroke="#fff" stroke-width="2.5"/>
+    `).join('')}
+    <!-- labels pontos -->
+    <text x="${x(0)}" y="${y(proj[0])-12}" font-size="11" font-weight="800" fill="#C9402E" text-anchor="start">VOCÊ HOJE: ${proj[0]}</text>
+    <text x="${x(21)}" y="${y(proj[3])-12}" font-size="11" font-weight="800" fill="#1E9E6A" text-anchor="end">DIA 21: ${proj[3]}</text>
+    <!-- eixo x -->
+    ${xs.map(d=>`<text x="${x(d)}" y="${H-10}" font-size="10" fill="#4E6660" text-anchor="middle" font-weight="600">${d===0?'Hoje':'Dia '+d}</text>`).join('')}
+  </svg>`;
+}
+
+/* ---------- navegação ---------- */
+const stage=document.getElementById('stage');
+const pfill=document.getElementById('pfill');
+const plabel=document.getElementById('plabel');
+const stickyCta=document.getElementById('stickyCta');
+const progressWrap=document.getElementById('progressWrap');
+
+function mount(){
+  stage.innerHTML='';
+  const s=steps[stepIndex];
+  const div=document.createElement('div');
+  div.className='screen';
+  div.innerHTML=s.render();
+  stage.appendChild(div);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>div.classList.add('active')));
+  const totalVisible=19;
+  const shown=Math.min(stepIndex+1,totalVisible);
+  pfill.style.width=(shown/totalVisible*100)+'%';
+  plabel.textContent=s.pv?'Oferta liberada ✓':`Etapa ${shown} de ${totalVisible}`;
+  stickyCta.classList.toggle('show',!!s.pv);
+  progressWrap.style.display=s.pv?'none':'block';
+  if(s.loading)runLoading();
+  stage.scrollTop=0;
+}
+function next(){if(stepIndex<steps.length-1){stepIndex++;mount();}}
+function pick(el,key,label){
+  el.parentElement.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[key]=label;
+  setTimeout(next,340);
+}
+function pickBristol(el,n){
+  el.parentElement.querySelectorAll('.bcard').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers.bristol=n;
+  setTimeout(next,380);
+}
+function pickScale(el,n){
+  el.parentElement.querySelectorAll('.scale-btn').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers.leveza=n;
+  setTimeout(next,340);
+}
+
+/* ---------- loading ---------- */
+function runLoading(){
+  const arc=document.getElementById('ringArc');
+  const pct=document.getElementById('ringPct');
+  const msg=document.getElementById('loadMsg');
+  const checks=[...document.querySelectorAll('#loadChecks div')];
+  const msgs=[
+    'Analisando suas respostas...',
+    'Classificando seu padrão intestinal...',
+    'Comparando com dados dos estudos SURMOUNT...',
+    'Seu Protocolo Destrava™ está quase pronto...'
+  ];
+  let p=0;
+  const t=setInterval(()=>{
+    p+=1;
+    if(p>100){clearInterval(t);setTimeout(next,500);return;}
+    pct.textContent=p+'%';
+    arc.style.strokeDashoffset=301.6*(1-p/100);
+    msg.textContent=msgs[Math.min(3,Math.floor(p/26))];
+    checks.forEach((c,i)=>{if(p>=(i+1)*24)c.classList.add('done');});
+  },42);
+}
+
+/* ---------- score ---------- */
+function computeScore(){
+  let score=0;
+  const b=answers.bristol||4;
+  if(b===1)score+=40;else if(b===2)score+=32;else if(b===3)score+=18;else if(b===4)score+=4;else score+=8;
+  const f=answers.freq||'';
+  if(f.includes('1 vez'))score+=25;else if(f.includes('2 a 3'))score+=18;else if(f.includes('4 a 6'))score+=8;
+  const lev=answers.leveza!==undefined?answers.leveza:5;
+  score+=Math.round((10-lev)*1.6);
+  if((answers.agua||'').includes('Menos de 1'))score+=8;
+  else if((answers.agua||'').includes('Não faço'))score+=5;
+  if((answers.fibra||'').includes('muito pouco'))score+=7;
+  else if((answers.fibra||'').includes('quase nada'))score+=5;
+  return Math.min(97,Math.max(15,score));
+}
+function severity(score){
+  if(score>=65)return{label:'SEVERO',frase:'constipação severa induzida por GLP-1'};
+  if(score>=40)return{label:'MODERADO',frase:'constipação moderada induzida por GLP-1'};
+  if(score>=22)return{label:'LEVE',frase:'lentificação intestinal em estágio inicial'};
+  return{label:'BAIXO',frase:'trânsito intestinal preservado (por enquanto)'};
+}
+
+/* =========================================================
+   PÁGINA DE VENDAS — estrutura campeã:
+   ANTES/DEPOIS → PREÇO C/ DESCONTO → (botão pulsando fixo)
+   → ENTREGÁVEIS+BÔNUS (preço riscado) → PROVA SOCIAL →
+   BENEFÍCIOS → GARANTIA → PREÇO → BOTÃO → +PROVA SOCIAL → FAQ
+========================================================= */
+function renderPV(){
+  const kg=(answers.kg||'').includes('Mais de 10')?'seus mais de 10kg eliminados':((answers.kg||'').includes('5 a 10')?'seus 5 a 10kg eliminados':'todo o seu progresso');
+  return `
+  <!-- 1. ANTES E DEPOIS -->
+  <div class="pv-section">
+    <div class="pv-h">De onde você está → para onde você vai</div>
+    <div class="before-after">
+      <div class="ba-card before">
+        <div class="ba-label">Você hoje</div>
+        <ul>
+          <li>❌ Bristol tipo 1–2: fezes duras</li>
+          <li>❌ Dias sem ir ao banheiro</li>
+          <li>❌ Barriga inchada e estufada</li>
+          <li>❌ Esforço e dor para evacuar</li>
+          <li>❌ Medo de parar a caneta</li>
+        </ul>
+      </div>
+      <div class="ba-card after">
+        <div class="ba-label">Você no dia 21</div>
+        <ul>
+          <li>✅ Bristol tipo 4: padrão ideal</li>
+          <li>✅ Banheiro todos os dias</li>
+          <li>✅ Barriga leve ao acordar</li>
+          <li>✅ Sem esforço, sem laxante</li>
+          <li>✅ Caneta mantida até a meta</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. PREÇO COM DESCONTO -->
+  <div class="pv-section">
+    <div class="price-box">
+      <span class="off-badge">62% OFF · SÓ HOJE PELO SEU RESULTADO</span>
+      <div class="old">De R$97 por apenas</div>
+      <div class="new"><small>R$</small>37</div>
+      <div class="parc">ou 4x de R$9,84 · Acesso imediato e vitalício</div>
+    </div>
+    <button class="btn btn-spacer" onclick="goCheckout()">DESTRAVAR MEU INTESTINO AGORA →</button>
+    <div class="scarcity">⏳ Este desconto está vinculado ao seu resultado e expira em 15 minutos</div>
+  </div>
+
+  <!-- 3. ENTREGÁVEIS + BÔNUS -->
+  <div class="pv-section">
+    <div class="pv-h">Tudo que você recebe hoje:</div>
+    <div class="deliv">
+      <div class="deliv-item">
+        <div class="ic">📗</div>
+        <div class="dt">
+          <b>Protocolo Destrava™ — 21 dias</b>
+          <span>O passo a passo dia a dia: a sequência de hidratação que reidrata o bolo fecal, as 2 fibras certas na ordem certa e o ajuste de refeições que trabalha a favor do esvaziamento lento.</span>
+          <span class="val"><s>R$97</s> · <em>Incluso</em></span>
+        </div>
+      </div>
+      <div class="deliv-item">
+        <div class="ic">🌙</div>
+        <div class="dt">
+          <span class="bonus-tag">Bônus 1</span>
+          <b>Guia do Magnésio Noturno</b>
+          <span>O tipo exato de magnésio para trânsito intestinal, a dose noturna ideal e o que NUNCA misturar com a caneta.</span>
+          <span class="val"><s>R$47</s> · <em>Grátis hoje</em></span>
+        </div>
+      </div>
+      <div class="deliv-item">
+        <div class="ic">🥗</div>
+        <div class="dt">
+          <span class="bonus-tag">Bônus 2</span>
+          <b>Cardápio "Sem Fome de Fibra"</b>
+          <span>Como bater sua meta de fibras comendo POUCO — feito para quem está com o apetite cortado pela caneta.</span>
+          <span class="val"><s>R$37</s> · <em>Grátis hoje</em></span>
+        </div>
+      </div>
+      <div class="deliv-item">
+        <div class="ic">🚨</div>
+        <div class="dt">
+          <span class="bonus-tag">Bônus 3</span>
+          <b>Plano de Emergência do Dia 4</b>
+          <span>O que fazer quando você já está há 4+ dias sem evacuar — sem recorrer a laxante irritativo.</span>
+          <span class="val"><s>R$27</s> · <em>Grátis hoje</em></span>
+        </div>
+      </div>
+    </div>
+    <div class="total-line">
+      <div class="t1">Valor total: <s>R$208</s></div>
+      <div class="t2">Hoje: R$37 à vista</div>
+    </div>
+  </div>
+
+  <!-- 4. PROVA SOCIAL -->
+  <div class="pv-section">
+    <div class="pv-h">Quem já destravou:</div>
+    <div class="testi" style="margin-top:0">
+      <div class="who"><div class="avatar">P</div><div><b>Patrícia L., 41 — Curitiba/PR</b><div class="stars">★★★★★</div></div></div>
+      <p>"Ozempic há 7 meses. Eu tomava laxante toda semana e vivia com cólica. Segui o protocolo à risca: no dia 6 fui ao banheiro naturalmente pela primeira vez em meses. Hoje é todo dia, de manhã, sem pensar."</p>
+    </div>
+    <div class="testi">
+      <div class="who"><div class="avatar">M</div><div><b>Márcia T., 58 — São Paulo/SP</b><div class="stars">★★★★★</div></div></div>
+      <p>"Meu médico só dizia 'beba mais água'. O protocolo me mostrou que a ORDEM das coisas importava. Bristol tipo 2 virou tipo 4 em duas semanas. Não parei o Mounjaro um dia sequer."</p>
+    </div>
+  </div>
+
+  <!-- 5. BENEFÍCIOS -->
+  <div class="pv-section">
+    <div class="pv-h">Por que o Protocolo Destrava™ funciona:</div>
+    <div class="benefits">
+      <div class="benefit"><span class="tick">✓</span><span><b>Ataca a causa mecânica</b> — foi desenhado para o intestino desacelerado pelo GLP-1, não para constipação comum.</span></div>
+      <div class="benefit"><span class="tick">✓</span><span><b>Zero conflito com a caneta</b> — você mantém dose e aplicação normalmente. O protocolo protege ${kg}.</span></div>
+      <div class="benefit"><span class="tick">✓</span><span><b>Sem laxante irritativo</b> — laxantes viciam o intestino e pioram o problema a médio prazo. Aqui o intestino volta a trabalhar sozinho.</span></div>
+      <div class="benefit"><span class="tick">✓</span><span><b>Simples de seguir</b> — 10 minutos de leitura por dia, checklist diário, tudo no celular.</span></div>
+      <div class="benefit"><span class="tick">✓</span><span><b>Resultado acompanhável</b> — você mede seu progresso pela própria Escala de Bristol, semana a semana.</span></div>
+    </div>
+  </div>
+
+  <!-- 6. GARANTIA -->
+  <div class="pv-section">
+    <div class="guarantee-box">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 3v6c0 5-3.5 9.3-8 11-4.5-1.7-8-6-8-11V5l8-3z" fill="#0E6B5C"/><path d="M8.5 12l2.4 2.4 4.6-4.8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>Garantia Blindada de 30 dias</h3>
+      <p>Siga o protocolo por 30 dias. Se o seu intestino não regular — ou se você simplesmente não gostar do material — devolvemos <b>100% do valor</b>, sem perguntas e sem burocracia. O risco é todo nosso.</p>
+    </div>
+  </div>
+
+  <!-- 7. PREÇO DE NOVO + BOTÃO -->
+  <div class="pv-section">
+    <div class="price-box">
+      <span class="off-badge">ÚLTIMA CHAMADA · 62% OFF</span>
+      <div class="old">De R$208 em valor total por</div>
+      <div class="new"><small>R$</small>37</div>
+      <div class="parc">Protocolo + 3 bônus · Acesso imediato</div>
+    </div>
+    <button class="btn btn-spacer" onclick="goCheckout()">SIM, QUERO O PROTOCOLO POR R$37 →</button>
+  </div>
+
+  <!-- 8. + PROVA SOCIAL -->
+  <div class="pv-section">
+    <div class="testi" style="margin-top:0">
+      <div class="who"><div class="avatar">A</div><div><b>Adriana S., 49 — Fortaleza/CE</b><div class="stars">★★★★★</div></div></div>
+      <p>"Comprei desconfiada, por causa da garantia. No dia 21 mandei mensagem pra minha irmã: 'compra isso agora'. Ela usa Wegovy e sofria igual. Nós duas reguladas hoje."</p>
+    </div>
+  </div>
+
+  <!-- 9. FAQ -->
+  <div class="pv-section">
+    <div class="pv-h">Perguntas frequentes</div>
+    <div class="faq">
+      ${faqItem('Preciso parar ou reduzir a caneta?','Não — esse é justamente o ponto. O protocolo foi desenhado para funcionar JUNTO com o tratamento GLP-1. Você mantém sua dose e aplicação normalmente. (E nunca altere sua medicação sem falar com seu médico.)')}
+      ${faqItem('É laxante ou remédio?','Não. É um protocolo de hábitos: sequência de hidratação, fibras específicas na ordem certa, um tipo de magnésio suplementar e ajustes de horário das refeições. Nada de laxante irritativo, que vicia o intestino.')}
+      ${faqItem('Em quanto tempo vejo resultado?','A maioria relata a primeira evacuação confortável entre o dia 4 e o dia 7. A regulação completa (banheiro todo dia, Bristol tipo 4) costuma vir entre a 2ª e a 3ª semana.')}
+      ${faqItem('Como recebo o material?','Acesso imediato após a compra, direto no seu celular ou computador. É digital — nada chega pela sua casa e nada aparece na fatura com nome constrangedor.')}
+      ${faqItem('E se não funcionar pra mim?','Você tem 30 dias de garantia incondicional. Não regulou ou não gostou? Devolvemos 100% do valor, sem perguntas.')}
+      ${faqItem('Serve para Ozempic, Wegovy e manipulados?','Sim. O mecanismo da constipação é o mesmo em todos os análogos de GLP-1 (semaglutida, tirzepatida e liraglutida): a desaceleração do trânsito intestinal.')}
+    </div>
+  </div>
+
+  <button class="btn" onclick="goCheckout()">DESTRAVAR MEU INTESTINO — R$37 →</button>
+  <div class="scarcity">🔒 Compra 100% segura · Garantia de 30 dias</div>
+
+  <p class="disclaimer">Este material tem caráter informativo e educacional e não substitui avaliação médica. O Protocolo Destrava™ é um programa de hábitos alimentares e suplementação natural. Não interrompa nem altere a dose da sua medicação sem orientação do seu médico. Se você está há mais de 7 dias sem evacuar, com dor intensa, vômitos ou sangramento, procure atendimento médico imediatamente. Resultados variam de pessoa para pessoa.</p>
+  `;
+}
+function faqItem(q,a){
+  return `<div class="faq-item">
+    <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      <span>${q}</span><span class="chev">›</span>
+    </button>
+    <div class="faq-a"><p>${a}</p></div>
+  </div>`;
+}
+function goCheckout(){
+  alert('→ Redirecionar para o checkout\n\n(No funil real, aqui vai o link do checkout com os parâmetros: bristol='+(answers.bristol||'-')+', score='+computeScore()+', idade='+(answers.idade||'-')+')');
+}
+
+mount();
+</script>
+</body>
+</html>
