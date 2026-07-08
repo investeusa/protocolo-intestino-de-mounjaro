@@ -152,6 +152,21 @@ const hero=document.querySelector('.hero');
 window.addEventListener('scroll',()=>{
   sticky.classList.toggle('show',window.scrollY>hero.offsetHeight);
 },{passive:true});
+
+/* ========== [REMOVER] Passar parâmetros da URL para os links de checkout ========== */
+document.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.toString()) {
+    document.querySelectorAll('a[href*="track.intestinodemounjaro.com.br/cf/click"]').forEach(link => {
+      const url = new URL(link.href);
+      urlParams.forEach((value, key) => {
+        url.searchParams.set(key, value);
+      });
+      link.href = url.toString();
+    });
+  }
+});
+/* ========== [FIM REMOVER] ========== */
   </script>
 </body>
 </html>

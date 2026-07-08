@@ -728,17 +728,12 @@ setInterval(()=>{
   tSec.textContent=String(total%60).padStart(2,'0');
 },1000);
 
-/* Passar parâmetros da URL para os links de checkout */
+/* ========== [REMOVER] Passar parâmetros da URL para os links de checkout ========== */
 document.addEventListener('DOMContentLoaded', function() {
   const urlParams = new URLSearchParams(window.location.search);
-  const checkoutUrl = 'https://track.intestinodemounjaro.com.br/cf/click/1';
-
-  // Se há parâmetros na URL
   if (urlParams.toString()) {
-    // Encontrar todos os links que apontam para o URL de checkout
     document.querySelectorAll('a[href*="track.intestinodemounjaro.com.br/cf/click"]').forEach(link => {
       const url = new URL(link.href);
-      // Adicionar todos os parâmetros da URL principal aos links
       urlParams.forEach((value, key) => {
         url.searchParams.set(key, value);
       });
@@ -746,6 +741,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+/* ========== [FIM REMOVER] ========== */
 </script>
 <script>
       var delaySeconds = 2*60 + 15;

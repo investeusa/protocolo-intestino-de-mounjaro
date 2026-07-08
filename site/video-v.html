@@ -714,6 +714,21 @@ setInterval(()=>{
   tMin.textContent=String(Math.floor(total/60)).padStart(2,'0');
   tSec.textContent=String(total%60).padStart(2,'0');
 },1000);
+
+/* ========== [REMOVER] Passar parâmetros da URL para os links de checkout ========== */
+document.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.toString()) {
+    document.querySelectorAll('a[href*="track.intestinodemounjaro.com.br/cf/click"]').forEach(link => {
+      const url = new URL(link.href);
+      urlParams.forEach((value, key) => {
+        url.searchParams.set(key, value);
+      });
+      link.href = url.toString();
+    });
+  }
+});
+/* ========== [FIM REMOVER] ========== */
 </script>
 <script>
       var delaySeconds = 2*60 + 15;
