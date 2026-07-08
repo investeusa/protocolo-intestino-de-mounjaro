@@ -944,7 +944,7 @@ function faqItem(q,a){
   </div>`;
 }
 function goCheckout(){
-  alert('→ Redirecionar para o checkout\n\n(No funil real, aqui vai o link do checkout com os parâmetros: bristol='+(answers.bristol||'-')+', score='+computeScore()+', idade='+(answers.idade||'-')+')');
+  window.location.href = 'https://checkout.ticto.app/OA88B53AD?bristol='+(answers.bristol||'-')+'&score='+computeScore()+'&idade='+(answers.idade||'-');
 }
 
 mount();

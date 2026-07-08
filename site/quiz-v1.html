@@ -934,7 +934,7 @@ function placeGauge(){
   setTimeout(()=>{pin.style.left=score+'%';},250);
 }
 function goPV(){
-  alert('→ Redirecionar para a Página de Vendas do Protocolo Intestino de Mounjaro\n\n(No funil real, aqui vai o link da PV com os parâmetros do quiz: bristol=' + (answers.bristol||'-') + ', score=' + computeScore() + ')');
+  window.location.href = 'https://checkout.ticto.app/OA88B53AD?bristol=' + (answers.bristol||'-') + '&score=' + computeScore();
 }
 
 mount();
