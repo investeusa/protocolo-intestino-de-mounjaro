@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Teste do Intestino de Caneta™ | Protocolo Destrava</title>
+    <title>Teste do Intestino de Mounjaro | Protocolo Intestino de Mounjaro</title>
     <style>
   :root{
     --bg:#F4F8F6;
@@ -261,10 +261,10 @@
   <body>
     <div class="app">
       <div class="sticky-cta" id="stickyCta">
-        <button onclick="goCheckout()">DESTRAVAR MEU INTESTINO — R$47 →</button>
+        <button onclick="goCheckout()">DESTRAVAR MEU INTESTINO — R$ 47,00 →</button>
       </div>
       <div class="topbar">
-        <div class="brand">TESTE DO <span>INTESTINO DE CANETA</span>™</div>
+        <div class="brand">TESTE DO <span>INTESTINO DE MOUNJARO</span></div>
       </div>
       <div class="progress-wrap" id="progressWrap">
         <div class="progress-track"><div class="progress-fill"
@@ -277,13 +277,15 @@
 
     <script>
 /* =========================================================
-   TESTE DO INTESTINO DE CANETA™ — v2
+   TESTE DO INTESTINO DE MOUNJARO™ — v2
    Estrutura em 5 PARTES (framework Low Ticket):
    P1 Conexão inicial + básicas (+ prova social pós-idade + motivação)
    P2 Dores + identificação (respostas compreensivas)
    P3 Desejo (3 perguntas + future pacing + prova social)
    P4 Personalização (Bristol, frequência, água, fibra, kg)
    P5 Loading → solução pronta c/ GRÁFICO → Página de Vendas
+
+   Protocolo Intestino de Mounjaro — 7 dias
 ========================================================= */
 
 const answers={};
@@ -349,7 +351,7 @@ const steps=[
     <div class="eyebrow">Você está no lugar certo</div>
     <div class="stat-hero">
       <div class="big">+2.100</div>
-      <p>mulheres na faixa dos <b>${faixa||'40'}</b> que usam caneta emagrecedora já destravaram o intestino com o método do <b>Protocolo Destrava™</b> — sem parar a medicação e sem laxante todo dia.</p>
+      <p>mulheres na faixa dos <b>${faixa||'40'}</b> que usam caneta emagrecedora já destravaram o intestino com o método do <b>Protocolo Intestino de Mounjaro</b> — sem parar a medicação e sem laxante todo dia.</p>
     </div>
     <div class="testi">
       <div class="who">
@@ -589,7 +591,7 @@ const steps=[
         <div data-i="0"><span class="tick">✓</span> Classificando seu tipo na Escala de Bristol</div>
         <div data-i="1"><span class="tick">✓</span> Cruzando com seus dados de hidratação e fibras</div>
         <div data-i="2"><span class="tick">✓</span> Ajustando o plano ao seu objetivo de peso</div>
-        <div data-i="3"><span class="tick">✓</span> Montando seu Protocolo Destrava™ personalizado</div>
+        <div data-i="3"><span class="tick">✓</span> Montando seu Protocolo Intestino de Mounjaro personalizado</div>
       </div>
     </div>`
 },
@@ -607,12 +609,12 @@ const steps=[
     <p class="sub center" style="margin-top:6px">Bristol <b>tipo ${b}</b> · Índice de travamento: <b>${score}/100</b></p>
 
     <div class="chart-card">
-      <h3>Sua projeção com o Protocolo Destrava™</h3>
-      <div class="ch-sub">Índice de travamento intestinal — 21 dias</div>
+      <h3>Sua projeção com o Protocolo Intestino de Mounjaro</h3>
+      <div class="ch-sub">Índice de travamento intestinal — 7 dias</div>
       ${chartSVG(score)}
     </div>
 
-    <p class="sub center">Seguindo o protocolo do jeito certo, a projeção é sair de <b style="color:var(--danger)">${score}/100</b> hoje para a <b style="color:var(--green)">zona regulada (abaixo de 25)</b> em 3 semanas — indo ao banheiro todos os dias, <b>sem parar a caneta</b>.</p>
+    <p class="sub center">Seguindo o protocolo do jeito certo, a projeção é sair de <b style="color:var(--danger)">${score}/100</b> hoje para a <b style="color:var(--green)">zona regulada (abaixo de 25)</b> em 7 dias — indo ao banheiro todos os dias, <b>sem parar a caneta</b>.</p>
 
     <button class="btn" onclick="next()">VER MEU PROTOCOLO COMPLETO →</button>`;
   }
@@ -639,15 +641,15 @@ function bristol(n,title,desc,tagCls,tagTxt){
   </button>`;
 }
 
-/* ---------- gráfico SVG (hoje → dia 21) ---------- */
+/* ---------- gráfico SVG (hoje → dia 7) ---------- */
 function chartSVG(score){
   const W=380,H=190,padL=34,padR=14,padT=16,padB=30;
-  const xs=[0,7,14,21];
-  const proj=[score,Math.round(score*.62),Math.round(score*.34),Math.min(18,Math.round(score*.18))];
-  const x=v=>padL+(v/21)*(W-padL-padR);
+  const xs=[0,2,5,7];
+  const proj=[score,Math.round(score*.65),Math.round(score*.35),Math.min(18,Math.round(score*.12))];
+  const x=v=>padL+(v/7)*(W-padL-padR);
   const y=v=>padT+(1-v/100)*(H-padT-padB);
   const pts=xs.map((d,i)=>`${x(d)},${y(proj[i])}`).join(' ');
-  const area=`${x(0)},${y(proj[0])} ${pts} ${x(21)},${H-padB} ${x(0)},${H-padB}`;
+  const area=`${x(0)},${y(proj[0])} ${pts} ${x(7)},${H-padB} ${x(0)},${H-padB}`;
   return `
   <svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">
     <defs>
@@ -671,8 +673,8 @@ function chartSVG(score){
       <circle cx="${x(d)}" cy="${y(proj[i])}" r="6" fill="${i===0?'#C9402E':(i===3?'#1E9E6A':'#0E6B5C')}" stroke="#fff" stroke-width="2.5"/>
     `).join('')}
     <!-- labels pontos -->
-    <text x="${x(0)}" y="${y(proj[0])-12}" font-size="11" font-weight="800" fill="#C9402E" text-anchor="start">VOCÊ HOJE: ${proj[0]}</text>
-    <text x="${x(21)}" y="${y(proj[3])-12}" font-size="11" font-weight="800" fill="#1E9E6A" text-anchor="end">DIA 21: ${proj[3]}</text>
+    <text x="${x(0)}" y="${y(proj[0])-12}" font-size="11" font-weight="800" fill="#C9402E" text-anchor="start">HOJE: ${proj[0]}</text>
+    <text x="${x(7)}" y="${y(proj[3])-12}" font-size="11" font-weight="800" fill="#1E9E6A" text-anchor="end">DIA 7: ${proj[3]}</text>
     <!-- eixo x -->
     ${xs.map(d=>`<text x="${x(d)}" y="${H-10}" font-size="10" fill="#4E6660" text-anchor="middle" font-weight="600">${d===0?'Hoje':'Dia '+d}</text>`).join('')}
   </svg>`;
@@ -732,7 +734,7 @@ function runLoading(){
     'Analisando suas respostas...',
     'Classificando seu padrão intestinal...',
     'Comparando com dados dos estudos SURMOUNT...',
-    'Seu Protocolo Destrava™ está quase pronto...'
+    'Seu Protocolo Intestino de Mounjaro está quase pronto...'
   ];
   let p=0;
   const t=setInterval(()=>{
@@ -768,7 +770,7 @@ function severity(score){
 }
 
 /* =========================================================
-   PÁGINA DE VENDAS — estrutura campeã:
+   PÁGINA DE VENDAS — Protocolo Intestino de Mounjaro:
    ANTES/DEPOIS → PREÇO C/ DESCONTO → (botão pulsando fixo)
    → ENTREGÁVEIS+BÔNUS (preço riscado) → PROVA SOCIAL →
    BENEFÍCIOS → GARANTIA → PREÇO → BOTÃO → +PROVA SOCIAL → FAQ
@@ -806,13 +808,13 @@ function renderPV(){
   <!-- 2. PREÇO COM DESCONTO -->
   <div class="pv-section">
     <div class="price-box">
-      <span class="off-badge">62% OFF · SÓ HOJE PELO SEU RESULTADO</span>
-      <div class="old">De R$97 por apenas</div>
-      <div class="new"><small>R$</small>37</div>
-      <div class="parc">ou 4x de R$9,84 · Acesso imediato e vitalício</div>
+      <span class="off-badge">62% OFF · OFERTA DE LANÇAMENTO</span>
+      <div class="old">De R$161 por apenas</div>
+      <div class="new"><small>R$</small>47</div>
+      <div class="parc">até 9x de R$ 6,17 · Acesso imediato</div>
     </div>
     <button class="btn btn-spacer" onclick="goCheckout()">DESTRAVAR MEU INTESTINO AGORA →</button>
-    <div class="scarcity">⏳ Este desconto está vinculado ao seu resultado e expira em 15 minutos</div>
+    <div class="scarcity">⏳ A oferta com 62% OFF expira quando o tempo zerar</div>
   </div>
 
   <!-- 3. ENTREGÁVEIS + BÔNUS -->
@@ -822,41 +824,41 @@ function renderPV(){
       <div class="deliv-item">
         <div class="ic">📗</div>
         <div class="dt">
-          <b>Protocolo Destrava™ — 21 dias</b>
-          <span>O passo a passo dia a dia: a sequência de hidratação que reidrata o bolo fecal, as 2 fibras certas na ordem certa e o ajuste de refeições que trabalha a favor do esvaziamento lento.</span>
+          <b>Ebook: Protocolo Intestino de Mounjaro</b>
+          <span>Como destravar o intestino em poucas horas, quando canetas emagrecedoras (GLP-1) travam sua digestão. Protocolo completo de 7 dias com o passo a passo para provocar a primeira evacuação confortável, sequência de fibras e plano de emergência para dia 4.</span>
           <span class="val"><s>R$97</s> · <em>Incluso</em></span>
         </div>
       </div>
       <div class="deliv-item">
-        <div class="ic">🌙</div>
+        <div class="ic">📗</div>
         <div class="dt">
           <span class="bonus-tag">Bônus 1</span>
-          <b>Guia do Magnésio Noturno</b>
-          <span>O tipo exato de magnésio para trânsito intestinal, a dose noturna ideal e o que NUNCA misturar com a caneta.</span>
-          <span class="val"><s>R$47</s> · <em>Grátis hoje</em></span>
+          <b>Ebook Intestino Regulado e Desinflamado</b>
+          <span>O guia de manutenção para depois dos 7 dias: como manter o intestino funcionando todo dia e desinflar a barriga de vez.</span>
+          <span class="val"><s>R$37</s> · <em>GRÁTIS hoje</em></span>
         </div>
       </div>
       <div class="deliv-item">
-        <div class="ic">🥗</div>
+        <div class="ic">🥤</div>
         <div class="dt">
           <span class="bonus-tag">Bônus 2</span>
-          <b>Cardápio "Sem Fome de Fibra"</b>
-          <span>Como bater sua meta de fibras comendo POUCO — feito para quem está com o apetite cortado pela caneta.</span>
-          <span class="val"><s>R$47</s> · <em>Grátis hoje</em></span>
+          <b>Ebook 7 Sucos Destrava Intestino</b>
+          <span>7 receitas de sucos funcionais para acelerar o protocolo — com os ingredientes certos para quem come pouco por causa da caneta.</span>
+          <span class="val"><s>R$27</s> · <em>GRÁTIS hoje</em></span>
         </div>
       </div>
       <div class="deliv-item">
-        <div class="ic">🚨</div>
+        <div class="ic">🍊</div>
         <div class="dt">
           <span class="bonus-tag">Bônus 3</span>
-          <b>Plano de Emergência do Dia 4</b>
-          <span>O que fazer quando você já está há 4+ dias sem evacuar — sem recorrer a laxante irritativo.</span>
-          <span class="val"><s>R$27</s> · <em>Grátis hoje</em></span>
+          <b>Ebook Sucos Imunológicos</b>
+          <span>Neste guia, você encontrará uma coleção de receitas de sucos detox, repletos de ingredientes naturais, ricos em vitaminas e antioxidantes, projetados especificamente para impulsionar o seu sistema imunológico.</span>
+          <span class="val"><s>R$27</s> · <em>GRÁTIS hoje</em></span>
         </div>
       </div>
     </div>
     <div class="total-line">
-      <div class="t1">Valor total: <s>R$208</s></div>
+      <div class="t1">Valor total: <s>R$161</s></div>
       <div class="t2">Hoje: R$47 à vista</div>
     </div>
   </div>
@@ -876,13 +878,13 @@ function renderPV(){
 
   <!-- 5. BENEFÍCIOS -->
   <div class="pv-section">
-    <div class="pv-h">Por que o Protocolo Destrava™ funciona:</div>
+    <div class="pv-h">Por que o Protocolo Intestino de Mounjaro funciona:</div>
     <div class="benefits">
       <div class="benefit"><span class="tick">✓</span><span><b>Ataca a causa mecânica</b> — foi desenhado para o intestino desacelerado pelo GLP-1, não para constipação comum.</span></div>
       <div class="benefit"><span class="tick">✓</span><span><b>Zero conflito com a caneta</b> — você mantém dose e aplicação normalmente. O protocolo protege ${kg}.</span></div>
       <div class="benefit"><span class="tick">✓</span><span><b>Sem laxante irritativo</b> — laxantes viciam o intestino e pioram o problema a médio prazo. Aqui o intestino volta a trabalhar sozinho.</span></div>
-      <div class="benefit"><span class="tick">✓</span><span><b>Simples de seguir</b> — 10 minutos de leitura por dia, checklist diário, tudo no celular.</span></div>
-      <div class="benefit"><span class="tick">✓</span><span><b>Resultado acompanhável</b> — você mede seu progresso pela própria Escala de Bristol, semana a semana.</span></div>
+      <div class="benefit"><span class="tick">✓</span><span><b>Destravi em 7 dias</b> — protocolo rápido e direto: primeira evacuação confortável já no primeiro dia, regulação completa em uma semana.</span></div>
+      <div class="benefit"><span class="tick">✓</span><span><b>Resultado acompanhável</b> — você mede seu progresso pela própria Escala de Bristol, dia a dia do protocolo.</span></div>
     </div>
   </div>
 
@@ -898,9 +900,9 @@ function renderPV(){
   <!-- 7. PREÇO DE NOVO + BOTÃO -->
   <div class="pv-section">
     <div class="price-box">
-      <span class="off-badge">ÚLTIMA CHAMADA · 62% OFF</span>
-      <div class="old">De R$208 em valor total por</div>
-      <div class="new"><small>R$</small>37</div>
+      <span class="off-badge">OFERTA DE LANÇAMENTO · 62% OFF</span>
+      <div class="old">De R$161 por apenas</div>
+      <div class="new"><small>R$</small>47</div>
       <div class="parc">Protocolo + 3 bônus · Acesso imediato</div>
     </div>
     <button class="btn btn-spacer" onclick="goCheckout()">SIM, QUERO O PROTOCOLO POR R$47 →</button>
@@ -920,17 +922,17 @@ function renderPV(){
     <div class="faq">
       ${faqItem('Preciso parar ou reduzir a caneta?','Não — esse é justamente o ponto. O protocolo foi desenhado para funcionar JUNTO com o tratamento GLP-1. Você mantém sua dose e aplicação normalmente. (E nunca altere sua medicação sem falar com seu médico.)')}
       ${faqItem('É laxante ou remédio?','Não. É um protocolo de hábitos: sequência de hidratação, fibras específicas na ordem certa, um tipo de magnésio suplementar e ajustes de horário das refeições. Nada de laxante irritativo, que vicia o intestino.')}
-      ${faqItem('Em quanto tempo vejo resultado?','A maioria relata a primeira evacuação confortável entre o dia 4 e o dia 7. A regulação completa (banheiro todo dia, Bristol tipo 4) costuma vir entre a 2ª e a 3ª semana.')}
+      ${faqItem('Em quanto tempo vejo resultado?','A maioria relata a primeira evacuação confortável já no primeiro dia. A regulação completa (banheiro todo dia, Bristol tipo 4) costuma vir entre o 5º e 7º dia do protocolo.')}
       ${faqItem('Como recebo o material?','Acesso imediato após a compra, direto no seu celular ou computador. É digital — nada chega pela sua casa e nada aparece na fatura com nome constrangedor.')}
       ${faqItem('E se não funcionar pra mim?','Você tem 30 dias de garantia incondicional. Não regulou ou não gostou? Devolvemos 100% do valor, sem perguntas.')}
       ${faqItem('Serve para Ozempic, Wegovy e manipulados?','Sim. O mecanismo da constipação é o mesmo em todos os análogos de GLP-1 (semaglutida, tirzepatida e liraglutida): a desaceleração do trânsito intestinal.')}
     </div>
   </div>
 
-  <button class="btn" onclick="goCheckout()">DESTRAVAR MEU INTESTINO — R$47 →</button>
+  <button class="btn" onclick="goCheckout()">DESTRAVAR MEU INTESTINO — R$ 47,00 →</button>
   <div class="scarcity">🔒 Compra 100% segura · Garantia de 30 dias</div>
 
-  <p class="disclaimer">Este material tem caráter informativo e educacional e não substitui avaliação médica. O Protocolo Destrava™ é um programa de hábitos alimentares e suplementação natural. Não interrompa nem altere a dose da sua medicação sem orientação do seu médico. Se você está há mais de 7 dias sem evacuar, com dor intensa, vômitos ou sangramento, procure atendimento médico imediatamente. Resultados variam de pessoa para pessoa.</p>
+  <p class="disclaimer">Este material tem caráter informativo e educacional e não substitui avaliação médica. O Protocolo Intestino de Mounjaro é um programa de hábitos alimentares e suplementação natural. Não interrompa nem altere a dose da sua medicação sem orientação do seu médico. Se você está há mais de 7 dias sem evacuar, com dor intensa, vômitos ou sangramento, procure atendimento médico imediatamente. Resultados variam de pessoa para pessoa.</p>
   `;
 }
 function faqItem(q,a){
