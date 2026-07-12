@@ -308,29 +308,9 @@ const bristolSVG={
 ========================================================= */
 const steps=[
 
-/* 1. ESCALA DE BRISTOL — PRIMEIRA ETAPA */
-{
-  render:()=>`
-    <div class="eyebrow">Personalização · Escala de Bristol</div>
-    <h2>Nos últimos 7 dias, qual formato descreve melhor as suas fezes?</h2>
-    <div class="bristol-note">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#0E6B5C"/><path d="M12 7v6M12 16.5v.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
-      <p>A Escala de Bristol é a classificação clínica usada por gastroenterologistas no mundo todo para avaliar o trânsito intestinal.</p>
-    </div>
-    <div class="bristol-grid">
-      ${bristol(1,'Tipo 1 — Bolinhas duras e separadas','Difíceis de eliminar','hard','Constipação severa')}
-      ${bristol(2,'Tipo 2 — Linguiça granulosa e compactada','Ressecado','hard','Constipação')}
-      ${bristol(3,'Tipo 3 — Linguiça com rachaduras','Trânsito lentificado','loose','Tendência a ressecar')}
-      ${bristol(4,'Tipo 4 — Lisa e macia','O padrão ideal','ok','Normal')}
-      ${bristol(5,'Tipo 5 — Pedaços macios definidos','Trânsito acelerado','loose','Levemente solto')}
-      ${bristol(6,'Tipo 6 — Pedaços aerados irregulares','Pastoso','loose','Solto')}
-      ${bristol(7,'Tipo 7 — Totalmente líquida','Sem partes sólidas','loose','Diarreia')}
-    </div>`
-},
-
 /* ============ PARTE 1 — CONEXÃO INICIAL + BÁSICAS ============ */
 
-/* 2. Entrada + segmentação */
+/* 1. Entrada + segmentação */
 {
   render:()=>`
     <div class="eyebrow">Avaliação gratuita · 2 minutos</div>
@@ -518,6 +498,26 @@ const steps=[
 },
 
 /* ============ PARTE 4 — PERSONALIZAÇÃO ============ */
+
+/* 13. Escala de Bristol */
+{
+  render:()=>`
+    <div class="eyebrow">Personalização · Escala de Bristol</div>
+    <h2>Nos últimos 7 dias, qual formato descreve melhor as suas fezes?</h2>
+    <div class="bristol-note">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#0E6B5C"/><path d="M12 7v6M12 16.5v.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <p>A Escala de Bristol é a classificação clínica usada por gastroenterologistas no mundo todo para avaliar o trânsito intestinal.</p>
+    </div>
+    <div class="bristol-grid">
+      ${bristol(1,'Tipo 1 — Bolinhas duras e separadas','Difíceis de eliminar','hard','Constipação severa')}
+      ${bristol(2,'Tipo 2 — Linguiça granulosa e compactada','Ressecado','hard','Constipação')}
+      ${bristol(3,'Tipo 3 — Linguiça com rachaduras','Trânsito lentificado','loose','Tendência a ressecar')}
+      ${bristol(4,'Tipo 4 — Lisa e macia','O padrão ideal','ok','Normal')}
+      ${bristol(5,'Tipo 5 — Pedaços macios definidos','Trânsito acelerado','loose','Levemente solto')}
+      ${bristol(6,'Tipo 6 — Pedaços aerados irregulares','Pastoso','loose','Solto')}
+      ${bristol(7,'Tipo 7 — Totalmente líquida','Sem partes sólidas','loose','Diarreia')}
+    </div>`
+},
 
 /* 14. Frequência */
 {
